@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "859623356146",
+    "firebase_url": "https://byu-ais-hackathon-default-rtdb.firebaseio.com",
+    "project_id": "byu-ais-hackathon",
+    "storage_bucket": "byu-ais-hackathon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859623356146:android:cb35358b97b7485268c26b",
+        "android_client_info": {
+          "package_name": "com.example.ais_hackathon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvizAdbd90Xdai_iegRsGiX-Obheh6Ado"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859623356146:android:5198aa03feef34df68c26b",
+        "android_client_info": {
+          "package_name": "com.example.ais_hackathon_better"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvizAdbd90Xdai_iegRsGiX-Obheh6Ado"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
