@@ -95,7 +95,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 const SizedBox(height: 40),
                 Container(
                   constraints: BoxConstraints(
-                    minWidth: 500,
+                    // minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
@@ -111,7 +111,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 const SizedBox(height: 4),
                 Container(
                   constraints: BoxConstraints(
-                    minWidth: 500,
+                    minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
@@ -127,7 +127,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 Container(height: 10),
                 Container(
                   constraints: BoxConstraints(
-                    minWidth: 500,
+                    minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
@@ -146,7 +146,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 Container(height: 10),
                 Container(
                   constraints: BoxConstraints(
-                    minWidth: 500,
+                    minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
@@ -164,7 +164,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 Container(height: 10),
                 Container(
                   constraints: BoxConstraints(
-                    minWidth: 500,
+                    minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
@@ -242,29 +242,47 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
       //     ? await FirebaseAuth.instance.signInWithPopup(provider)
       //     : await FirebaseAuth.instance
       //         .signInWithCredential(provider.credential());
+      // if (kIsWeb) {
+      //   debugPrint("On the web");
+      //   FirebaseAuth.instance.signOut();
+      //   cred = await FirebaseAuth.instance.signInWithPopup(provider);
+      //   debugPrint(cred.user?.displayName);
+      //   debugPrint(cred.user?.email);
+      // } else {
+      //   debugPrint("Not on web");
+      //   try {
+      //     // TODO implement normal sign in without microsoft
+      //     // await FirebaseAuth.instance.signInWithEmailAndPassword(
+      //     //   email: "jackestes10@yahoo.com",
+      //     //   password: "3210JTE06",
+      //     // );
+      //     // debugPrint("User: ");
+      //     // cred = await FirebaseAuth.instance.currentUser!
+      //     //     .linkWithProvider(provider);
+      //     // debugPrint(cred.user?.displayName);
+      //     // debugPrint(cred.user?.email);
+      //   } on FirebaseAuthException catch (e) {
+      //     errorMessage = "${e.code} - ${e.message}";
+      //     debugPrint(errorMessage);
+      //   }
+      final microsoftProvider = MicrosoftAuthProvider();
+      microsoftProvider.setCustomParameters({
+        // This allows people under BYU org to sign in w/ BYU microsoft accounts
+        "tenant": "common",
+        // This allows people to verify the account they signed in with
+        "prompt": "select_account",
+        // Other types of custom params include:
+        //    {prompt, login}, {prompt, consent}, {login_hint},
+        //    {domain_hint}, and {scope}
+      });
       if (kIsWeb) {
-        debugPrint("On the web");
-        FirebaseAuth.instance.signOut();
-        cred = await FirebaseAuth.instance.signInWithPopup(provider);
-        debugPrint(cred.user?.displayName);
-        debugPrint(cred.user?.email);
+        cred = await FirebaseAuth.instance.signInWithPopup(
+          provider,
+        );
       } else {
-        debugPrint("Not on web");
-        try {
-          // TODO implement normal sign in without microsoft
-          // await FirebaseAuth.instance.signInWithEmailAndPassword(
-          //   email: "jackestes10@yahoo.com",
-          //   password: "3210JTE06",
-          // );
-          // debugPrint("User: ");
-          // cred = await FirebaseAuth.instance.currentUser!
-          //     .linkWithProvider(provider);
-          // debugPrint(cred.user?.displayName);
-          // debugPrint(cred.user?.email);
-        } on FirebaseAuthException catch (e) {
-          errorMessage = "${e.code} - ${e.message}";
-          debugPrint(errorMessage);
-        }
+        cred = await FirebaseAuth.instance.signInWithProvider(
+          microsoftProvider,
+        );
       }
     } on FirebaseAuthException catch (e) {
       errorMessage = "${e.code} - ${e.message}";
