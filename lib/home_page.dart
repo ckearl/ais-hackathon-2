@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -43,9 +41,6 @@ class HomePage extends StatelessWidget {
               ),
               onPressed: () async {
                 FirebaseAuth.instance.signOut();
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.remove('microsoft_access_token');
-                await DefaultCacheManager().emptyCache();
               },
             ),
           ],
