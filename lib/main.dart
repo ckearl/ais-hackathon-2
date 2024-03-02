@@ -83,6 +83,10 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
+      debugPrint("Width: ${constraints.maxWidth} px");
+      double widthFactor =
+          (constraints.maxWidth > 650) ? 650 / constraints.maxWidth : 1;
+      double widthFactorModifier = (kIsWeb) ? .96 : .93;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(6),
         child: Center(
@@ -99,7 +103,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
+                    widthFactor: widthFactor * widthFactorModifier,
                     child: TextField(
                       controller: emailController,
                       cursorColor: Colors.black,
@@ -115,7 +119,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
+                    widthFactor: widthFactor * widthFactorModifier,
                     child: TextField(
                       controller: passwordController,
                       textInputAction: TextInputAction.next,
@@ -124,17 +128,17 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     ),
                   ),
                 ),
-                Container(height: 10),
+                Container(height: 20),
                 Container(
                   constraints: BoxConstraints(
                     minWidth: constraints.maxWidth / 2,
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
+                    widthFactor: widthFactor,
                     child: SocialLoginButton(
                       onPressed: () {
-                        _loginWithMicrosoft();
+                        _loginWithEmail();
                         setState(() {});
                       },
                       // onPressed: () {},
@@ -150,7 +154,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
+                    widthFactor: widthFactor,
                     child: SocialLoginButton(
                       onPressed: () {
                         _loginWithMicrosoft();
@@ -168,7 +172,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     maxWidth: constraints.maxWidth,
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
+                    widthFactor: widthFactor,
                     child: SocialLoginButton(
                       onPressed: () => _signUpWithEmail(),
                       // onPressed: () {},
@@ -182,9 +186,12 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                 if (errorMessage != "")
                   Column(
                     children: [
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
+                      Center(
+                        child: Text(
+                          errorMessage,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       const SizedBox(height: 20),
                     ],
