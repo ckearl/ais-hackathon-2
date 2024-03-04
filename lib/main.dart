@@ -50,7 +50,7 @@ class MainPage extends StatelessWidget {
                 child: Text('Something went wrong!'),
               );
             } else if (snapshot.hasData) {
-              return const HomePage();
+              return HomePage();
             } else {
               return const MicrosoftLoginWidget();
               // return const LoginWidget();
@@ -259,6 +259,22 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
           microsoftProvider,
         );
       }
+
+      // These users are microsoft users from a specific university.
+      // The fname and lname will always be the first and last words in the
+      // display name string of the user.
+      // var user = cred.user;
+      // var regex = RegExp(r' ');
+      // var fname = user?.displayName?.split(regex).first;
+      // var lname = user?.displayName?.split(regex).last;
+      // // Registers the now authenticated user to the firebase database
+      // FirebaseDatabase.instance.ref().child('users/${user?.uid}').set({
+      //   "email": "${user?.email}",
+      //   "username": "${user?.email}",
+      //   "fname": "$fname",
+      //   "lname": "$lname",
+      //   "isAdmin": "false",
+      // });
     } on FirebaseAuthException catch (e) {
       errorMessage = "${e.code} - ${e.message}";
       debugPrint(errorMessage);
