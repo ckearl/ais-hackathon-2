@@ -1,6 +1,7 @@
 import 'package:ais_hackathon_better/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
@@ -259,25 +260,50 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
           microsoftProvider,
         );
       }
-
-      // These users are microsoft users from a specific university.
-      // The fname and lname will always be the first and last words in the
-      // display name string of the user.
-      // var user = cred.user;
-      // var regex = RegExp(r' ');
-      // var fname = user?.displayName?.split(regex).first;
-      // var lname = user?.displayName?.split(regex).last;
-      // // Registers the now authenticated user to the firebase database
-      // FirebaseDatabase.instance.ref().child('users/${user?.uid}').set({
-      //   "email": "${user?.email}",
-      //   "username": "${user?.email}",
-      //   "fname": "$fname",
-      //   "lname": "$lname",
-      //   "isAdmin": "false",
-      // });
+      _checkAndAddUserToDatabase(cred);
     } on FirebaseAuthException catch (e) {
       errorMessage = "${e.code} - ${e.message}";
       debugPrint(errorMessage);
     }
+  }
+}
+
+_checkAndAddUserToDatabase(UserCredential cred) async {
+  try {
+    // Sets the user info in the database if it doesn't currently exist
+    var user = cred.user;
+    // These users are microsoft users from a specific university.
+    // The fname and lname will always be the first and last words in the
+    // display name string of the user.
+    var nameRegex = RegExp(r' ');
+    var fname = user?.displayName?.split(nameRegex).first;
+    var lname = user?.displayName?.split(nameRegex).last;
+    // These users are microsoft users from a specific university.
+    // The username will be their netID which is their microsoft email
+    // excluding the @byu.edu or other email domains for that matter.
+    var usernameRegex = RegExp(r'@[^@\s]+$');
+    var username = user?.email?.replaceAll(usernameRegex, '');
+    debugPrint("Username: $username");
+    // Registers the now authenticated user to the firebase database if said
+    // user doesn't already exist within the database.
+    if ((await FirebaseDatabase.instance
+            .ref()
+            .child('users/${user?.uid}')
+            .get())
+        .exists) {
+      debugPrint(
+          "User already exists in database, no need to change their data");
+    } else {
+      debugPrint("User not in database yet, adding them now...");
+      FirebaseDatabase.instance.ref().child('users/${user?.uid}').set({
+        "email": "${user?.email}",
+        "username": "$username",
+        "fname": "$fname",
+        "lname": "$lname",
+        "isAdmin": false,
+      });
+    }
+  } on FirebaseException catch (e) {
+    debugPrint("${e.code} - ${e.message}");
   }
 }
