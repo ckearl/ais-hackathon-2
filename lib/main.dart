@@ -130,6 +130,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                   ),
                 ),
                 Container(height: 20),
+                // Generic Login Button
                 Container(
                   constraints: BoxConstraints(
                     minWidth: constraints.maxWidth / 2,
@@ -139,7 +140,10 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                     widthFactor: widthFactor,
                     child: SocialLoginButton(
                       onPressed: () {
-                        _loginWithEmail();
+                        _loginWithEmail(
+                          emailController.text,
+                          passwordController.text,
+                        );
                         setState(() {});
                       },
                       // onPressed: () {},
@@ -149,6 +153,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                   ),
                 ),
                 Container(height: 10),
+                // Microsoft Login Button
                 Container(
                   constraints: BoxConstraints(
                     minWidth: constraints.maxWidth / 2,
@@ -167,6 +172,7 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                   ),
                 ),
                 Container(height: 10),
+                // Sign Up Button
                 Container(
                   constraints: BoxConstraints(
                     minWidth: constraints.maxWidth / 2,
@@ -174,8 +180,12 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
                   ),
                   child: FractionallySizedBox(
                     widthFactor: widthFactor,
+                    // TODO move this implementation to a new screen with password verification through multiline string check
                     child: SocialLoginButton(
-                      onPressed: () => _signUpWithEmail(),
+                      onPressed: () => _signUpWithEmail(
+                        emailController.text,
+                        passwordController.text,
+                      ),
                       // onPressed: () {},
                       buttonType: SocialLoginButtonType.generalLogin,
                       backgroundColor: const Color.fromRGBO(0, 46, 93, 1),
@@ -205,25 +215,28 @@ class _MicrosoftLoginWidgetState extends State<MicrosoftLoginWidget> {
     });
   }
 
-  _signUpWithEmail() async {}
-
-  _loginWithEmail() async {
+  _signUpWithEmail(String email, String password) async {
     try {
-      final provider = OAuthProvider("microsoft.com");
-      provider.setCustomParameters({
-        // This allows people under BYU org to sign in w/ BYU microsoft accounts
-        "tenant": "common",
-        // This allows people to verify the account they signed in with
-        "prompt": "select_account",
-        // Other types of custom params include:
-        //    {prompt, login}, {prompt, consent}, {login_hint},
-        //    {domain_hint}, and {scope}
-      });
-
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: "jackestes10@yahoo.com",
-        password: "Jellyfish",
+      UserCredential cred =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
+      _checkAndAddUserToDatabase(cred);
+    } on FirebaseAuthException catch (e) {
+      errorMessage = "${e.code} - ${e.message}";
+      debugPrint(errorMessage);
+    }
+  }
+
+  _loginWithEmail(String email, String password) async {
+    try {
+      UserCredential cred =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _checkAndAddUserToDatabase(cred);
     } on FirebaseAuthException catch (e) {
       errorMessage = "${e.code} - ${e.message}";
       debugPrint(errorMessage);
