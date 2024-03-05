@@ -296,7 +296,6 @@ _checkAndAddUserToDatabase(UserCredential cred) async {
     // excluding the @byu.edu or other email domains for that matter.
     var usernameRegex = RegExp(r'@[^@\s]+$');
     var username = user?.email?.replaceAll(usernameRegex, '');
-    debugPrint("Username: $username");
     // Registers the now authenticated user to the firebase database if said
     // user doesn't already exist within the database.
     if ((await FirebaseDatabase.instance

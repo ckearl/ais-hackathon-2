@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:ais_hackathon_better/firebase_instance_objects.dart'
     as db_object;
 import 'package:firebase_auth/firebase_auth.dart' as fb_user;
@@ -27,12 +25,23 @@ class _HomePageState extends State<HomePage> {
     var userId = user?.uid;
     DatabaseReference dbUserRef = dbRef.child('users/$userId');
 
+    // User to create default values of an authenticated user from their info.
+    // If manual updates from the database are made, those will auto populate instead.
+    var nameRegex = RegExp(r' ');
+    var fname = user?.displayName?.split(nameRegex).first;
+    var lname = user?.displayName?.split(nameRegex).last;
+    // These users are microsoft users from a specific university.
+    // The username will be their netID which is their microsoft email
+    // excluding the @byu.edu or other email domains for that matter.
+    var usernameRegex = RegExp(r'@[^@\s]+$');
+    var username = user?.email?.replaceAll(usernameRegex, '');
+
     // Default user object
     userObjectMap = <String, dynamic>{
-      'fname': "FirstNameNotSet",
-      'lname': "LastNameNotSet",
-      'email': "email@domain.lol",
-      'username': "email@domain.lol",
+      'fname': "${fname}",
+      'lname': "${lname}",
+      'email': "${user?.email}",
+      'username': "$username",
       'isAdmin': false,
     };
 
@@ -96,54 +105,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // User is signed in. Get the reference of the user from the database.
-    // Does this in real time and auto updates if the database is changed manually.
-
-    // customObj.User currentUser;
-    // dbUserRef.once(DatabaseEventType.value).then((value) {
-    //   debugPrint(value.snapshot.value.toString());
-    //   currentUser =
-    //       customObj.User.fromJson(jsonDecode(jsonEncode(value.snapshot.value)));
-    //   debugPrint("User: ${currentUser.toString()}");
-    // });
-
-    // dbUserRef.onValue.listen((event) {
-    //   setState(() {
-    //     debugPrint("Showing user data");
-    //     debugPrint(event.snapshot.value.toString());
-    //   });
-    // });
-
-    // // Get the user's last name from the database
-    // dbUserRef.child('lname').onValue.listen((event) {
-    //   setState(() {
-    //     lastName = event.snapshot.value.toString();
-    //   });
-    // });
-    // // Get the user's username from the database
-    // dbUserRef.child('username').onValue.listen((event) {
-    //   setState(() {
-    //     username = event.snapshot.value.toString();
-    //   });
-    // });
-    // // Get the user's email from the database
-    // dbUserRef.child('email').onValue.listen((event) {
-    //   setState(() {
-    //     email = event.snapshot.value.toString();
-    //   });
-    // });
-    // // Determine user's permissions from database value
-    // dbUserRef.child('isAdmin').onValue.listen((event) {
-    //   setState(() {
-    //     if (event.snapshot.value.toString() == "false") {
-    //       isAdmin = false;
-    //     } else {
-    //       isAdmin = true;
-    //     }
-    //   });
-    // });
-
-    // if (snapshot.hasData)
     db_object.User currUser = db_object.User.fromJson(userObjectMap);
     String firstName = currUser.fname;
     String lastName = currUser.lname;
@@ -211,91 +172,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  // Future<Map<String, dynamic>> fetchUser(DatabaseReference dbUserRef) async {
-  //   Completer<Map<String, dynamic>> userObjectMap =
-  //       Completer<Map<String, dynamic>>();
-  //
-  //   dbUserRef.onValue.listen((event) async {
-  //     String firstName = await fetchUserFirstName(dbUserRef);
-  //     debugPrint("First name from User: $firstName");
-  //
-  //     String lastName = await fetchUserLastName(dbUserRef);
-  //     debugPrint("Last name from User: $lastName");
-  //
-  //     String email = await fetchUserEmail(dbUserRef);
-  //     debugPrint("Email from User: $email");
-  //
-  //     String username = await fetchUserUsername(dbUserRef);
-  //     debugPrint("Username from User: $username");
-  //
-  //     bool isAdmin = await fetchUserAdminPrivilege(dbUserRef);
-  //     debugPrint("Admin privilege from User: $isAdmin");
-  //
-  //     userObjectMap.complete({
-  //       'fname': firstName,
-  //       'lname': lastName,
-  //       'email': email,
-  //       'username': username,
-  //       'isAdmin': isAdmin,
-  //     });
-  //   });
-  //
-  //   return userObjectMap.future;
-  // }
-
-  Future<String> fetchUserFirstName(DatabaseReference dbUserRef) async {
-    Completer<String> completer = Completer<String>();
-    // Get the user's first name from the database
-    dbUserRef.child('fname').onValue.listen((event) {
-      String firstName = event.snapshot.value.toString();
-      completer.complete(firstName);
-    });
-    return completer.future;
-  }
-
-  Future<String> fetchUserLastName(DatabaseReference dbUserRef) async {
-    Completer<String> completer = Completer<String>();
-    // Get the user's first name from the database
-    dbUserRef.child('lname').onValue.listen((event) {
-      String lastName = event.snapshot.value.toString();
-      completer.complete(lastName);
-    });
-    return completer.future;
-  }
-
-  Future<String> fetchUserEmail(DatabaseReference dbUserRef) async {
-    Completer<String> completer = Completer<String>();
-    // Get the user's first name from the database
-    dbUserRef.child('email').onValue.listen((event) {
-      String email = event.snapshot.value.toString();
-      completer.complete(email);
-    });
-    return completer.future;
-  }
-
-  Future<String> fetchUserUsername(DatabaseReference dbUserRef) async {
-    Completer<String> completer = Completer<String>();
-    // Get the user's first name from the database
-    dbUserRef.child('username').onValue.listen((event) {
-      String username = event.snapshot.value.toString();
-      completer.complete(username);
-    });
-    return completer.future;
-  }
-
-  Future<bool> fetchUserAdminPrivilege(DatabaseReference dbUserRef) async {
-    Completer<bool> completer = Completer<bool>();
-    // Get the user's first name from the database
-    dbUserRef.child('isAdmin').onValue.listen((event) {
-      String isAdmin = event.snapshot.value.toString();
-      if (isAdmin == "false") {
-        completer.complete(false);
-      } else {
-        completer.complete(true);
-      }
-    });
-    return completer.future;
   }
 }
