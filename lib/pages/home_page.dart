@@ -1,6 +1,9 @@
 import 'package:ais_hackathon_better/widgets/user_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/user_events_attended_page.dart';
 
 class NavigationBarApp extends StatelessWidget {
   final String uid;
@@ -9,6 +12,7 @@ class NavigationBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
       home: NavigationExample(uid: uid),
     );
@@ -24,6 +28,7 @@ class NavigationExample extends StatefulWidget {
 }
 
 class _NavigationExampleState extends State<NavigationExample> {
+  final dbRef = FirebaseDatabase.instance.ref();
   int currentPageIndex = 0;
   bool isAdmin = false;
 
@@ -50,7 +55,6 @@ class _NavigationExampleState extends State<NavigationExample> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    debugPrint("isAdmin: $isAdmin");
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -58,7 +62,6 @@ class _NavigationExampleState extends State<NavigationExample> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
         selectedIndex: currentPageIndex,
         destinations: <Widget>[
           const NavigationDestination(
@@ -72,11 +75,9 @@ class _NavigationExampleState extends State<NavigationExample> {
             label: 'Settings',
           ),
           const NavigationDestination(
-            icon: Badge(
-              label: Text('2'),
-              child: Icon(Icons.messenger_sharp),
-            ),
-            label: 'Messages',
+            selectedIcon: Icon(Icons.event),
+            icon: Badge(child: Icon(Icons.event_outlined)),
+            label: 'Events',
           ),
           if (isAdmin)
             const NavigationDestination(
@@ -107,46 +108,53 @@ class _NavigationExampleState extends State<NavigationExample> {
         const UserInfoPage(),
 
         /// Messages page
-        ListView.builder(
-          reverse: true,
-          itemCount: 2,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Hello',
-                    style: theme.textTheme.bodyLarge!
-                        .copyWith(color: theme.colorScheme.onPrimary),
-                  ),
-                ),
-              );
-            }
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.all(8.0),
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Text(
-                  'Hi!',
-                  style: theme.textTheme.bodyLarge!
-                      .copyWith(color: theme.colorScheme.onPrimary),
-                ),
-              ),
-            );
-          },
+        // TODO change this to a list view for each event in the database
+        // TODO maybe make it a calendar view and have it be selectable
+        UserEventsAttendedPage(
+          dbRef: dbRef,
+          userId: FirebaseAuth.instance.currentUser!.uid,
         ),
+
+        // ListView.builder(
+        //   reverse: true,
+        //   itemCount: 2,
+        //   itemBuilder: (BuildContext context, int index) {
+        //     if (index == 0) {
+        //       return Align(
+        //         alignment: Alignment.centerRight,
+        //         child: Container(
+        //           margin: const EdgeInsets.all(8.0),
+        //           padding: const EdgeInsets.all(8.0),
+        //           decoration: BoxDecoration(
+        //             color: theme.colorScheme.primary,
+        //             borderRadius: BorderRadius.circular(8.0),
+        //           ),
+        //           child: Text(
+        //             'Hello',
+        //             style: theme.textTheme.bodyLarge!
+        //                 .copyWith(color: theme.colorScheme.onPrimary),
+        //           ),
+        //         ),
+        //       );
+        //     }
+        //     return Align(
+        //       alignment: Alignment.centerLeft,
+        //       child: Container(
+        //         margin: const EdgeInsets.all(8.0),
+        //         padding: const EdgeInsets.all(8.0),
+        //         decoration: BoxDecoration(
+        //           color: theme.colorScheme.primary,
+        //           borderRadius: BorderRadius.circular(8.0),
+        //         ),
+        //         child: Text(
+        //           'Hi!',
+        //           style: theme.textTheme.bodyLarge!
+        //               .copyWith(color: theme.colorScheme.onPrimary),
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // ),
 
         /// Admin page
         if (isAdmin)
