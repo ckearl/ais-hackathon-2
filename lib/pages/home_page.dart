@@ -1,4 +1,4 @@
-import 'package:ais_hackathon_better/firebase_instance_objects.dart'
+import 'package:ais_hackathon_better/firebase/firebase_instance_objects.dart'
     as db_object;
 import 'package:firebase_auth/firebase_auth.dart' as fb_user;
 import 'package:firebase_database/firebase_database.dart';
