@@ -144,8 +144,8 @@ class EventItem {
   String eventItemLocation;
   String eventItemInfo;
   String eventId;
-  DateTime itemStartTime;
-  DateTime itemEndTime;
+  DateTime eventItemStartTime;
+  DateTime eventItemEndTime;
   String waiver;
 
   EventItem({
@@ -154,8 +154,8 @@ class EventItem {
     required this.eventItemLocation,
     required this.eventItemInfo,
     required this.eventId,
-    required this.itemStartTime,
-    required this.itemEndTime,
+    required this.eventItemStartTime,
+    required this.eventItemEndTime,
     required this.waiver,
   });
 
@@ -166,8 +166,8 @@ class EventItem {
       eventItemLocation: json['eventItemLocation'],
       eventItemInfo: json['eventItemInfo'],
       eventId: json['eventId'],
-      itemStartTime: json['itemStartTime'],
-      itemEndTime: json['itemEndTime'],
+      eventItemStartTime: json['itemStartTime'],
+      eventItemEndTime: json['itemEndTime'],
       waiver: json['waiver'],
     );
   }
@@ -179,8 +179,8 @@ class EventItem {
       "eventItemLocation": eventItemLocation,
       "eventItemInfo": eventItemInfo,
       "eventId": eventId,
-      "itemStartTime": itemStartTime,
-      "itemEndTime": itemEndTime,
+      "itemStartTime": eventItemStartTime,
+      "itemEndTime": eventItemEndTime,
       "waiver": waiver,
     };
   }
@@ -189,8 +189,8 @@ class EventItem {
   String toString() {
     return "EventItem{eventItemId: $eventItemId, eventItemTitle: "
         "$eventItemTitle, eventItemLocation: $eventItemLocation, eventItemInfo: "
-        "$eventItemInfo, eventId: $eventId, itemStartTime: $itemStartTime, "
-        "itemEndTime: $itemEndTime, waiver: $waiver}";
+        "$eventItemInfo, eventId: $eventId, itemStartTime: $eventItemStartTime, "
+        "itemEndTime: $eventItemEndTime, waiver: $waiver}";
   }
 }
 

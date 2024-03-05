@@ -17,7 +17,7 @@ class UserEventsAttendedPage extends StatefulWidget {
 
 class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   List<UserEvent> userEvents = [];
-  Set<Event> events = {};
+  Map<String, Event> events = {};
   Set<EventItem> eventItems = {};
 
   @override
@@ -35,7 +35,6 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
             .equalTo(widget.userId)
             .once())
         .snapshot;
-    debugPrint("snapshot: ${userEventSnapshot.children.length}");
 
     // Loop through user's attendance data
     for (var element in userEventSnapshot.children) {
@@ -56,16 +55,10 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                 : true,
       ));
 
-      debugPrint("EventID: ${userEvents.last.eventId}");
-      debugPrint(
-        "Event info for user event: ${(await widget.dbRef.child('events/'
-            '${userEvents.last.eventId}').once()).snapshot.children.length}",
-      );
-      debugPrint("\n\n");
       DataSnapshot eventSnapshot =
           (await widget.dbRef.child('events/${userEvents.last.eventId}').once())
               .snapshot;
-      events.add(Event(
+      events[eventSnapshot.key!] = (Event(
         eventId: eventSnapshot.key!,
         eventDescription:
             eventSnapshot.child('eventDescription').value.toString(),
@@ -77,7 +70,35 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
         eventLocation: eventSnapshot.child('eventLocation').value.toString(),
         eventInfo: eventSnapshot.child('eventInfo').value.toString(),
       ));
-      debugPrint("${events.last.toString()}");
+    }
+
+    debugPrint("Looking for event items");
+    await _fetchEventItems();
+    debugPrint("Event items found");
+  }
+
+  Future<void> _fetchEventItems() async {
+    DataSnapshot eventItemsSnapshot =
+        (await widget.dbRef.child('eventItems').once()).snapshot;
+    for (var snapshot in eventItemsSnapshot.children) {
+      if (events[snapshot.child('eventID').value.toString()] != null) {
+        debugPrint(
+            "Event found matching the ID: ${snapshot.child('eventID').value}");
+        eventItems.add(EventItem(
+          eventItemId: snapshot.key!,
+          eventItemTitle: snapshot.child('eventItemTitle').value.toString(),
+          eventItemLocation:
+              snapshot.child('eventItemLocation').value.toString(),
+          eventItemInfo: snapshot.child('eventItemInfo').value.toString(),
+          eventId: snapshot.child('eventID').value.toString(),
+          eventItemStartTime: DateTime.parse(
+              snapshot.child('eventItemStartTime').value.toString()),
+          eventItemEndTime: DateTime.parse(
+              snapshot.child('eventItemEndTime').value.toString()),
+          waiver: snapshot.child('waiver').value.toString(),
+        ));
+      }
+      debugPrint(eventItems.last.toString());
     }
   }
 
