@@ -27,6 +27,9 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   }
 
   Future<void> _fetchUserEvents() async {
+    debugPrint("Fetching user events");
+    debugPrint(
+        "awaiting: ${await widget.dbRef.child('userEvents').orderByChild('userID').equalTo(widget.userId).once()}");
     // Fetch the user's attendance data from the userEvents node in the
     // realtime database
     DataSnapshot userEventSnapshot = (await widget.dbRef
@@ -35,9 +38,11 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
             .equalTo(widget.userId)
             .once())
         .snapshot;
+    debugPrint("Total expected loops: ${userEventSnapshot.children.length}");
 
     // Loop through user's attendance data
     for (var element in userEventSnapshot.children) {
+      debugPrint("Looping");
       userEvents.add(UserEvent(
         userEventId: element.key!,
         userId: element.child('userID').value.toString(),
@@ -71,6 +76,7 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
         eventInfo: eventSnapshot.child('eventInfo').value.toString(),
       ));
     }
+    debugPrint("User Events: ${userEvents.length}");
 
     debugPrint("Looking for event items");
     await _fetchEventItems();
@@ -78,6 +84,7 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   }
 
   Future<void> _fetchEventItems() async {
+    debugPrint("Fetching event items");
     DataSnapshot eventItemsSnapshot =
         (await widget.dbRef.child('eventItems').once()).snapshot;
     for (var snapshot in eventItemsSnapshot.children) {
@@ -104,20 +111,38 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("User Events"),
-      ),
-      body: ListView.builder(
-        itemCount: userEvents.length,
-        itemBuilder: (context, index) {
-          UserEvent event = userEvents[index];
-          return ListTile(
-            title: Text("Type${event.eventId}: ${event.eventId}"),
-            subtitle: Text(event.userId),
+    debugPrint("User Events: ${userEvents.length}");
+    debugPrint("Events: ${events.length}");
+    debugPrint("Event Items: ${eventItems.length}");
+    return FutureBuilder(
+      future: _fetchUserEvents(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // While the future is loading, show a loading indicator
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // If there's an error in the future, display an error message
+          return Text('Error: ${snapshot.error}');
+        } else {
+          // If the future has completed successfully, you can build your UI
+          // using the data fetched by _fetchUserEvents()
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("User Events"),
+            ),
+            body: ListView.builder(
+              itemCount: userEvents.length,
+              itemBuilder: (context, index) {
+                UserEvent event = userEvents[index];
+                return ListTile(
+                  title: Text("Type${event.eventId}: ${event.eventId}"),
+                  subtitle: Text(event.userId),
+                );
+              },
+            ),
           );
-        },
-      ),
+        }
+      },
     );
   }
 }
