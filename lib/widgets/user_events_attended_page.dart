@@ -22,28 +22,17 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   Map<String, List<EventItem>> eventItemsMap = {};
 
   Future<void> _fetchUserEvents() async {
-    debugPrint("getting userEvents");
     userEvents = await getListOfUserEvents(widget.dbRef, widget.userId);
-    debugPrint("getting Events");
     events = await getMapOfEventsFromUserEventsList(widget.dbRef, userEvents);
     await _fetchEventItems();
   }
 
   Future<void> _fetchEventItems() async {
-    debugPrint("getting eventItems");
     eventItemsMap = await getMapOfEventItemsFromEventsMap(widget.dbRef, events);
-    debugPrint("all things done been got");
-    for (var item in eventItemsMap.keys) {
-      debugPrint("Item: ${item}");
-    }
-    debugPrint("Event items map: $eventItemsMap");
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("User Events: ${userEvents.length}");
-    debugPrint("Events: ${events.length}");
-    debugPrint("Event Items: ${eventItems.length}");
     return FutureBuilder(
       future: _fetchUserEvents(),
       builder: (context, snapshot) {
@@ -85,23 +74,32 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                   itemCount: userEvents.length,
                   itemBuilder: (context, index) {
                     UserEvent userEvent = userEvents[index];
-                    return ListTile(
-                      // TODO change this to Event Title: Type
-                      title: Text(
-                        "Type ${eventItemsMap[userEvent.eventId]?.first.eventItemTitle}: "
-                        "${EventItemType(
-                          eventItemTypeId: eventItemsMap[userEvent.eventId]!
+                    // If event has been attended or hasn't occurred yet, show it in the list.
+                    if (userEvent.isAttended ||
+                        DateTime.parse(events[userEvent.eventId]!
+                                .eventStartTime
+                                .toString())
+                            .isAfter(DateTime.now())) {
+                      return ListTile(
+                        // TODO change this to Event Title: Type
+                        title: Text(
+                          "Type ${eventItemsMap[userEvent.eventId]?.first.eventItemTitle}: "
+                          "${EventItemType(
+                            eventItemTypeId: eventItemsMap[userEvent.eventId]!
+                                .first!
+                                .eventItemType,
+                            typeName: "Discover",
+                          ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
+                          textAlign: TextAlign.center,
+                        ),
+                        subtitle: Text(
+                          eventItemsMap[userEvent.eventId]!
                               .first!
-                              .eventItemType,
-                          typeName: "Discover",
-                        ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
-                        textAlign: TextAlign.center,
-                      ),
-                      subtitle: Text(
-                        eventItemsMap[userEvent.eventId]!.first!.eventItemInfo,
-                        textAlign: TextAlign.center,
-                      ),
-                    );
+                              .eventItemInfo,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
                   },
                 ),
               ),
@@ -130,8 +128,9 @@ Future<List<UserEvent>> getListOfUserEvents(
       userEventId: element.key!,
       userId: element.child('userID').value.toString(),
       eventId: element.child('eventID').value.toString(),
-      isAttended:
-          (element.child('userID').value.toString() == "false") ? false : true,
+      isAttended: (element.child('isAttended').value.toString() == "false")
+          ? false
+          : true,
       broughtPlusOne:
           (element.child('broughtPlusOne').value.toString() == "false")
               ? false
@@ -178,22 +177,13 @@ Future<Map<String, List<EventItem>>> getMapOfEventItemsFromEventsMap(
 ) async {
   Map<String, List<EventItem>> eventItemsMap = {};
 
-  debugPrint("Fetching event items");
   DataSnapshot eventItemsSnapshot =
       (await dbRef.child('eventItems').once()).snapshot;
   for (var snapshot in eventItemsSnapshot.children) {
     if (events[snapshot.child('eventID').value.toString()] != null) {
-      debugPrint(
-          "Event found matching the ID: ${snapshot.child('eventID').value}");
-
-      debugPrint("checking to see if value has a list in map");
-      debugPrint(
-          "Map[${snapshot.child('eventID').value.toString()}]: ${eventItemsMap[snapshot.child('eventID').value.toString()]}");
       if (eventItemsMap[snapshot.child('eventID').value.toString()] == null) {
-        debugPrint("adding a list in map");
         eventItemsMap[snapshot.child('eventID').value.toString()] = [];
       }
-      debugPrint("value has a list in map");
 
       eventItemsMap[snapshot.child('eventID').value.toString()]?.add((EventItem(
         eventItemId: snapshot.key!,
