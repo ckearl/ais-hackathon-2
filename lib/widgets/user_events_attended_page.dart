@@ -96,6 +96,7 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
               snapshot.child('eventItemStartTime').value.toString()),
           eventItemEndTime: DateTime.parse(
               snapshot.child('eventItemEndTime').value.toString()),
+          eventItemType: snapshot.child('eventItemType').value.toString(),
           waiver: snapshot.child('waiver').value.toString(),
         ));
       }
@@ -148,14 +149,25 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                 child: ListView.builder(
                   itemCount: userEvents.length,
                   itemBuilder: (context, index) {
-                    UserEvent event = userEvents[index];
+                    UserEvent userEvent = userEvents[index];
                     return ListTile(
+                      // TODO change this to Event Title: Type
                       title: Text(
-                        "Type${event.eventId}: ${event.eventId}",
+                        "Type ${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemTitle}: "
+                        "${EventItemType(
+                          eventItemTypeId: eventItems
+                              .firstWhere((element) =>
+                                  element.eventId == userEvent.eventId)
+                              .eventItemType,
+                          typeName: "Discover",
+                        ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
                         textAlign: TextAlign.center,
                       ),
                       subtitle: Text(
-                        event.userId,
+                        eventItems
+                            .firstWhere((element) =>
+                                element.eventId == userEvent.eventId)
+                            .eventItemInfo,
                         textAlign: TextAlign.center,
                       ),
                     );

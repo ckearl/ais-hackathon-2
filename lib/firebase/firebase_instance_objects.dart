@@ -146,6 +146,7 @@ class EventItem {
   String eventId;
   DateTime eventItemStartTime;
   DateTime eventItemEndTime;
+  String eventItemType;
   String waiver;
 
   EventItem({
@@ -156,6 +157,7 @@ class EventItem {
     required this.eventId,
     required this.eventItemStartTime,
     required this.eventItemEndTime,
+    required this.eventItemType,
     required this.waiver,
   });
 
@@ -168,6 +170,7 @@ class EventItem {
       eventId: json['eventId'],
       eventItemStartTime: json['itemStartTime'],
       eventItemEndTime: json['itemEndTime'],
+      eventItemType: json['eventItemType'],
       waiver: json['waiver'],
     );
   }
@@ -181,6 +184,7 @@ class EventItem {
       "eventId": eventId,
       "itemStartTime": eventItemStartTime,
       "itemEndTime": eventItemEndTime,
+      "eventItemType": eventItemType,
       "waiver": waiver,
     };
   }
@@ -190,35 +194,36 @@ class EventItem {
     return "EventItem{eventItemId: $eventItemId, eventItemTitle: "
         "$eventItemTitle, eventItemLocation: $eventItemLocation, eventItemInfo: "
         "$eventItemInfo, eventId: $eventId, itemStartTime: $eventItemStartTime, "
-        "itemEndTime: $eventItemEndTime, waiver: $waiver}";
+        "itemEndTime: $eventItemEndTime, eventItemType: $eventItemType, "
+        "waiver: $waiver}";
   }
 }
 
-class EventType {
-  String eventTypeId;
+class EventItemType {
+  String eventItemTypeId;
   String typeName;
 
-  EventType({
-    required this.eventTypeId,
+  EventItemType({
+    required this.eventItemTypeId,
     required this.typeName,
   });
 
-  factory EventType.fromJson(Map<String, dynamic> json) {
-    return EventType(
-      eventTypeId: json['eventTypeId'],
+  factory EventItemType.fromJson(Map<String, dynamic> json) {
+    return EventItemType(
+      eventItemTypeId: json['eventItemTypeId'],
       typeName: json['typeName'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "eventTypeId": eventTypeId,
+      "eventItemTypeId": eventItemTypeId,
       "typeName": typeName,
     };
   }
 
   @override
   String toString() {
-    return "EventType{eventTypeId: $eventTypeId, typeName: $typeName}";
+    return "EventType{eventItemTypeId: $eventItemTypeId, typeName: $typeName}";
   }
 }
