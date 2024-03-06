@@ -20,12 +20,6 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   Map<String, Event> events = {};
   Set<EventItem> eventItems = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserEvents();
-  }
-
   Future<void> _fetchUserEvents() async {
     debugPrint("Fetching user events");
     debugPrint(
@@ -119,7 +113,21 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While the future is loading, show a loading indicator
-          return const CircularProgressIndicator();
+          return const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(),
+                  ),
+                ],
+              ),
+            ],
+          );
         } else if (snapshot.hasError) {
           // If there's an error in the future, display an error message
           return Text('Error: ${snapshot.error}');

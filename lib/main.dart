@@ -35,25 +35,23 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return const Center(
-                child: Text('Something went wrong!'),
-              );
-            } else if (snapshot.hasData) {
-              return NavigationBarApp(uid: snapshot.data!.uid);
-            } else {
-              return const LoginWidget();
-              // return const LoginWidget();
-            }
-          }),
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text('Something went wrong!'),
+          );
+        } else if (snapshot.hasData) {
+          return NavigationExample(uid: snapshot.data!.uid);
+        } else {
+          return const LoginWidget();
+        }
+      },
     );
   }
 }

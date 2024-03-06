@@ -29,7 +29,7 @@ class NavigationExample extends StatefulWidget {
 
 class _NavigationExampleState extends State<NavigationExample> {
   final dbRef = FirebaseDatabase.instance.ref();
-  int currentPageIndex = 0;
+  int _currentIndex = 0;
   bool isAdmin = false;
 
   @override
@@ -50,124 +50,82 @@ class _NavigationExampleState extends State<NavigationExample> {
         });
       }
     });
+    debugPrint("setting current index to $_currentIndex");
+  }
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+      debugPrint("setting current index to $_currentIndex");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        selectedIndex: currentPageIndex,
-        destinations: <Widget>[
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.settings),
-            icon: Badge(child: Icon(Icons.settings_outlined)),
-            label: 'Settings',
-          ),
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.event),
-            icon: Badge(child: Icon(Icons.event_outlined)),
-            label: 'Events',
-          ),
-          if (isAdmin)
-            const NavigationDestination(
-              selectedIcon: Icon(Icons.admin_panel_settings),
-              icon: Badge(
-                child: Icon(Icons.admin_panel_settings_outlined),
-              ),
-              label: 'Admin Stuff',
+    final List<Widget> pages = [
+      Card(
+        shadowColor: Colors.transparent,
+        margin: const EdgeInsets.all(8.0),
+        child: SizedBox.expand(
+          child: Center(
+            child: Text(
+              'Home page',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-        ],
+          ),
+        ),
       ),
-      body: <Widget>[
-        /// Home page
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Center(
-              child: Text(
-                'Home page',
-                style: theme.textTheme.titleLarge,
-              ),
+      const UserInfoPage(),
+      UserEventsAttendedPage(
+        dbRef: dbRef,
+        userId: FirebaseAuth.instance.currentUser!.uid,
+      ),
+      if (isAdmin)
+        const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Text("You are an admin!")],
+            )
+          ],
+        )
+    ];
+
+    return Scaffold(
+      body: pages[_currentIndex],
+      // For some reason, this padding needs to surround the bottom nav bar
+      // to work properly on small iOS devices (i.e. iPhone SE)
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(.000001, 0, .000001, 0),
+        child: BottomNavigationBar(
+          onTap: _onTabTapped,
+          currentIndex: _currentIndex,
+          items: [
+            const BottomNavigationBarItem(
+              activeIcon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
+              label: 'Home',
             ),
-          ),
+            const BottomNavigationBarItem(
+              activeIcon: Icon(Icons.settings),
+              icon: Icon(Icons.settings_outlined),
+              label: 'Settings',
+            ),
+            const BottomNavigationBarItem(
+              activeIcon: Icon(Icons.event),
+              icon: Icon(Icons.event_outlined),
+              label: 'Events',
+            ),
+            if (isAdmin)
+              const BottomNavigationBarItem(
+                activeIcon: Icon(Icons.admin_panel_settings),
+                icon: Icon(Icons.admin_panel_settings_outlined),
+                label: 'Admin Stuff',
+              ),
+          ],
         ),
-
-        /// User Settings page
-        const UserInfoPage(),
-
-        /// Messages page
-        // TODO change this to a list view for each event in the database
-        // TODO maybe make it a calendar view and have it be selectable
-        UserEventsAttendedPage(
-          dbRef: dbRef,
-          userId: FirebaseAuth.instance.currentUser!.uid,
-        ),
-
-        // ListView.builder(
-        //   reverse: true,
-        //   itemCount: 2,
-        //   itemBuilder: (BuildContext context, int index) {
-        //     if (index == 0) {
-        //       return Align(
-        //         alignment: Alignment.centerRight,
-        //         child: Container(
-        //           margin: const EdgeInsets.all(8.0),
-        //           padding: const EdgeInsets.all(8.0),
-        //           decoration: BoxDecoration(
-        //             color: theme.colorScheme.primary,
-        //             borderRadius: BorderRadius.circular(8.0),
-        //           ),
-        //           child: Text(
-        //             'Hello',
-        //             style: theme.textTheme.bodyLarge!
-        //                 .copyWith(color: theme.colorScheme.onPrimary),
-        //           ),
-        //         ),
-        //       );
-        //     }
-        //     return Align(
-        //       alignment: Alignment.centerLeft,
-        //       child: Container(
-        //         margin: const EdgeInsets.all(8.0),
-        //         padding: const EdgeInsets.all(8.0),
-        //         decoration: BoxDecoration(
-        //           color: theme.colorScheme.primary,
-        //           borderRadius: BorderRadius.circular(8.0),
-        //         ),
-        //         child: Text(
-        //           'Hi!',
-        //           style: theme.textTheme.bodyLarge!
-        //               .copyWith(color: theme.colorScheme.onPrimary),
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
-
-        /// Admin page
-        if (isAdmin)
-          const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text("You are an admin!")],
-              )
-            ],
-          )
-      ][currentPageIndex],
+      ),
     );
   }
 }
