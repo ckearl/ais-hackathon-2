@@ -19,6 +19,7 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   List<UserEvent> userEvents = [];
   Map<String, Event> events = {};
   Set<EventItem> eventItems = {};
+  Map<String, List<EventItem>> eventItemsMap = {};
 
   Future<void> _fetchUserEvents() async {
     debugPrint("Fetching user events");
@@ -180,4 +181,100 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
       },
     );
   }
+}
+
+Future<List<UserEvent>> getListOfUserEvents(
+  DatabaseReference dbRef,
+  String userID,
+) async {
+  List<UserEvent> userEvents = [];
+  DataSnapshot userEventSnapshot = (await dbRef
+          .child('userEvents')
+          .orderByChild('userID')
+          .equalTo(userID)
+          .once())
+      .snapshot;
+
+  for (var element in userEventSnapshot.children) {
+    userEvents.add(UserEvent(
+      userEventId: element.key!,
+      userId: element.child('userID').value.toString(),
+      eventId: element.child('eventID').value.toString(),
+      isAttended:
+          (element.child('userID').value.toString() == "false") ? false : true,
+      broughtPlusOne:
+          (element.child('broughtPlusOne').value.toString() == "false")
+              ? false
+              : true,
+      waiverSigned: (element.child('waiverSigned').value.toString() == "false")
+          ? false
+          : true,
+    ));
+  }
+
+  return userEvents;
+}
+
+Future<Map<String, Event>> getMapOfEventsFromUserEventsList(
+  DatabaseReference dbRef,
+  List<UserEvent> userEvents,
+) async {
+  Map<String, Event> eventsMap = {};
+
+  for (var event in userEvents) {
+    DataSnapshot eventSnapshot =
+        (await dbRef.child('events/${event.eventId}').once()).snapshot;
+
+    eventsMap[eventSnapshot.key!] = (Event(
+      eventId: eventSnapshot.key!,
+      eventDescription:
+          eventSnapshot.child('eventDescription').value.toString(),
+      eventTitle: eventSnapshot.child('eventTitle').value.toString(),
+      eventStartTime: DateTime.parse(
+          eventSnapshot.child('eventStartTime').value.toString()),
+      eventEndTime:
+          DateTime.parse(eventSnapshot.child('eventEndTime').value.toString()),
+      eventLocation: eventSnapshot.child('eventLocation').value.toString(),
+      eventInfo: eventSnapshot.child('eventInfo').value.toString(),
+    ));
+  }
+
+  return eventsMap;
+}
+
+Future<Map<String, List<EventItem>>> getMapOfEventItemsFromEventsMap(
+  DatabaseReference dbRef,
+  Map<String, Event> events,
+) async {
+  Map<String, List<EventItem>> eventItemsMap = {};
+
+  debugPrint("Fetching event items");
+  DataSnapshot eventItemsSnapshot =
+      (await dbRef.child('eventItems').once()).snapshot;
+  for (var snapshot in eventItemsSnapshot.children) {
+    if (events[snapshot.child('eventID').value.toString()] != null) {
+      debugPrint(
+          "Event found matching the ID: ${snapshot.child('eventID').value}");
+
+      if (eventItemsMap[snapshot.child('eventID').value.toString()]!.isEmpty) {
+        eventItemsMap[snapshot.child('eventID').value.toString()] = [];
+      }
+
+      eventItemsMap[snapshot.child('eventID').value.toString()]?.add((EventItem(
+        eventItemId: snapshot.key!,
+        eventItemTitle: snapshot.child('eventItemTitle').value.toString(),
+        eventItemLocation: snapshot.child('eventItemLocation').value.toString(),
+        eventItemInfo: snapshot.child('eventItemInfo').value.toString(),
+        eventId: snapshot.child('eventID').value.toString(),
+        eventItemStartTime: DateTime.parse(
+            snapshot.child('eventItemStartTime').value.toString()),
+        eventItemEndTime:
+            DateTime.parse(snapshot.child('eventItemEndTime').value.toString()),
+        eventItemType: snapshot.child('eventItemType').value.toString(),
+        waiver: snapshot.child('waiver').value.toString(),
+      )));
+    }
+  }
+
+  return eventItemsMap;
 }
