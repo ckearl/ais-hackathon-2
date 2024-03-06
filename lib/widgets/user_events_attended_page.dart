@@ -128,17 +128,32 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
           // using the data fetched by _fetchUserEvents()
           return Scaffold(
             appBar: AppBar(
-              title: const Text("User Events"),
+              title: const Center(
+                child: Text(
+                  "User Events",
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
-            body: ListView.builder(
-              itemCount: userEvents.length,
-              itemBuilder: (context, index) {
-                UserEvent event = userEvents[index];
-                return ListTile(
-                  title: Text("Type${event.eventId}: ${event.eventId}"),
-                  subtitle: Text(event.userId),
-                );
-              },
+            body: Center(
+              child: SizedBox(
+                child: ListView.builder(
+                  itemCount: userEvents.length,
+                  itemBuilder: (context, index) {
+                    UserEvent event = userEvents[index];
+                    return ListTile(
+                      title: Text(
+                        "Type${event.eventId}: ${event.eventId}",
+                        textAlign: TextAlign.center,
+                      ),
+                      subtitle: Text(
+                        event.userId,
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           );
         }
