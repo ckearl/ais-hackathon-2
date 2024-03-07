@@ -1,11 +1,33 @@
 import 'package:ais_hackathon_better/firebase/firebase_instance_objects.dart'
     as db_object;
+import 'package:ais_hackathon_better/widgets/riverpod_stuff.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_user;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final userAdminProvider = StateNotifierProvider<UserAdminNotifier, bool>(
+  (ref) => UserAdminNotifier(),
+);
+final userLastNameProvider =
+    StateNotifierProvider<UserLastNameNotifier, String>(
+  (ref) => UserLastNameNotifier(),
+);
+final userFirstNameProvider =
+    StateNotifierProvider<UserFirstNameNotifier, String>(
+  (ref) => UserFirstNameNotifier(),
+);
+final userEmailProvider = StateNotifierProvider<UserEmailNotifier, String>(
+  (ref) => UserEmailNotifier(),
+);
+final userUsernameProvider =
+    StateNotifierProvider<UserUsernameNotifier, String>(
+  (ref) => UserUsernameNotifier(),
+);
 
 class UserInfoPage extends StatefulWidget {
-  const UserInfoPage({super.key});
+  final WidgetRef ref;
+  const UserInfoPage({super.key, required this.ref});
 
   @override
   State<UserInfoPage> createState() => _UserInfoPageState();
@@ -53,52 +75,41 @@ class _UserInfoPageState extends State<UserInfoPage> {
     // Listener which checks if the firebase realtime database has any manual
     // changes on its end for this user's first name.
     dbUserRef.child('fname').onValue.listen((event) {
-      if (mounted) {
-        setState(() {
-          userObjectMap['fname'] = event.snapshot.value.toString();
-        });
-      }
+      widget.ref.read(userFirstNameProvider.notifier).setString(
+            event.snapshot.value.toString(),
+          );
     });
 
     // Listener which checks if the firebase realtime database has any manual
     // changes on its end for this user's last name.
     dbUserRef.child('lname').onValue.listen((event) {
-      if (mounted) {
-        setState(() {
-          userObjectMap['lname'] = event.snapshot.value.toString();
-        });
-      }
+      widget.ref.read(userLastNameProvider.notifier).setString(
+            event.snapshot.value.toString(),
+          );
     });
 
     // Listener which checks if the firebase realtime database has any manual
     // changes on its end for this user's username.
     dbUserRef.child('username').onValue.listen((event) {
-      if (mounted) {
-        setState(() {
-          userObjectMap['username'] = event.snapshot.value.toString();
-        });
-      }
+      widget.ref.read(userUsernameProvider.notifier).setString(
+            event.snapshot.value.toString(),
+          );
     });
 
     // Listener which checks if the firebase realtime database has any manual
     // changes on its end for this user's email.
     dbUserRef.child('email').onValue.listen((event) {
-      if (mounted) {
-        setState(() {
-          userObjectMap['email'] = event.snapshot.value.toString();
-        });
-      }
+      widget.ref.read(userEmailProvider.notifier).setString(
+            event.snapshot.value.toString(),
+          );
     });
 
     // Listener which checks if the firebase realtime database has any manual
     // changes on its end for this user's admin privileges.
     dbUserRef.child('isAdmin').onValue.listen((event) {
-      if (mounted) {
-        setState(() {
-          userObjectMap['isAdmin'] =
-              (event.snapshot.value.toString() == 'false') ? false : true;
-        });
-      }
+      widget.ref.read(userAdminProvider.notifier).setBool(
+            event.snapshot.value.toString(),
+          );
     });
   }
 
@@ -118,57 +129,69 @@ class _UserInfoPageState extends State<UserInfoPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Signed In as:',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Email: $email",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Username: $username",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "First Name: $firstName",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Last Name: $lastName",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Admin Privileges: $isAdmin",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
+        child: Consumer(builder: (context, ref, _) {
+          isAdmin = ref.watch(userAdminProvider);
+          firstName = ref.watch(userFirstNameProvider);
+          lastName = ref.watch(userLastNameProvider);
+          username = ref.watch(userUsernameProvider);
+          email = ref.watch(userEmailProvider);
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Signed In as:',
+                style: TextStyle(fontSize: 16),
               ),
-              icon: const Icon(
-                Icons.arrow_back,
-                size: 32,
+              const SizedBox(height: 8),
+              Text(
+                "Email: $email",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              label: const Text(
-                'Sign Out',
-                style: TextStyle(fontSize: 24),
+              const SizedBox(height: 8),
+              Text(
+                "Username: $username",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              onPressed: () async {
-                fb_user.FirebaseAuth.instance.signOut();
-              },
-            ),
-          ],
-        ),
+              const SizedBox(height: 8),
+              Text(
+                "First Name: $firstName",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Last Name: $lastName",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Admin Privileges: ${isAdmin ? "Yes" : "No"}",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  size: 32,
+                ),
+                label: const Text(
+                  'Sign Out',
+                  style: TextStyle(fontSize: 24),
+                ),
+                onPressed: () async {
+                  fb_user.FirebaseAuth.instance.signOut();
+                },
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

@@ -22,3 +22,35 @@ class EventItemsMapNotifier extends StateNotifier<Map<DateTime, EventItem>> {
     state = eventItems;
   }
 }
+
+class UserAdminNotifier extends StateNotifier<bool> {
+  UserAdminNotifier() : super(false);
+
+  void setBool(String str) {
+    state = (str == 'false') ? false : true;
+  }
+}
+
+class UserLastNameNotifier extends StateNotifier<String> {
+  UserLastNameNotifier() : super("");
+
+  void setString(String str) => state = str;
+}
+
+class UserFirstNameNotifier extends StateNotifier<String> {
+  UserFirstNameNotifier() : super("");
+
+  void setString(String str) => state = str;
+}
+
+class UserEmailNotifier extends StateNotifier<String> {
+  UserEmailNotifier() : super("");
+
+  void setString(String str) => state = str;
+}
+
+class UserUsernameNotifier extends StateNotifier<String> {
+  UserUsernameNotifier() : super("");
+
+  void setString(String str) => state = str;
+}

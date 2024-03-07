@@ -8,7 +8,8 @@ import 'package:intl/intl.dart';
 
 final eventItemsMapProvider =
     StateNotifierProvider<EventItemsMapNotifier, Map<DateTime, EventItem>>(
-        (ref) => EventItemsMapNotifier());
+  (ref) => EventItemsMapNotifier(),
+);
 
 class DatabaseEventText extends StatelessWidget {
   final Event databaseEvent;

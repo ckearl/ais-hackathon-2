@@ -10,7 +10,8 @@ import 'other_useful_widgets.dart';
 
 final eventsMapProvider =
     StateNotifierProvider<EventsMapNotifier, Map<DateTime, List<Event>>>(
-        (ref) => EventsMapNotifier());
+  (ref) => EventsMapNotifier(),
+);
 
 class CalendarEventsPage extends StatefulWidget {
   final DatabaseReference dbRef;
@@ -66,6 +67,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
               FractionallySizedBox(
                 widthFactor: widthFactor * widthFactorModifier,
                 child: TableCalendar(
+                  rowHeight: (constraints.maxHeight * .3) / 6,
                   firstDay: DateTime.utc(2010, 10, 16),
                   lastDay: DateTime.utc(2050, 3, 14),
                   focusedDay: _focusedDay,
@@ -75,7 +77,6 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                   },
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
-                      debugPrint("Day selected");
                       _selectedDay = selectedDay;
                       _focusedDay =
                           focusedDay; // update `_focusedDay` here as well
@@ -92,7 +93,6 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                     _focusedDay = focusedDay;
                   },
                   eventLoader: (day) {
-                    debugPrint("Loading day");
                     return _getEventsForDay(day);
                   },
                 ),
@@ -152,16 +152,9 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
   // });
 
   List<Event> _getEventsForDay(DateTime day) {
-    debugPrint("Getting day's events");
     List<Event> events = [];
-    debugPrint("$events");
     for (var event in eventsMap.keys) {
-      // if (isSameDay(event, day)) {
-      //   events.addAll(eventsMap[event]!);
-      // }
-      debugPrint("Events ${eventsMap.keys.length}");
       if (eventsMap[event] != null) {
-        debugPrint("EventItems: ${eventsMap[event]?.length}");
         for (var item in eventsMap[event]!) {
           if (isSameDay(item.eventStartTime, day) ||
               (item.eventEndTime.isAfter(day) &&

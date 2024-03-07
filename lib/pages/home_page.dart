@@ -77,7 +77,6 @@ class _NavigationExampleState extends State<NavigationExample> {
           ),
         ),
       ),
-      const UserInfoPage(),
       UserEventsAttendedPage(
         dbRef: dbRef,
         userId: FirebaseAuth.instance.currentUser!.uid,
@@ -89,6 +88,9 @@ class _NavigationExampleState extends State<NavigationExample> {
           ref: ref,
         );
       }),
+      Consumer(builder: (context, ref, _) {
+        return UserInfoPage(ref: ref);
+      }),
       if (isAdmin)
         const Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +100,7 @@ class _NavigationExampleState extends State<NavigationExample> {
               children: [Text("You are an admin!")],
             )
           ],
-        )
+        ),
     ];
 
     return Scaffold(
@@ -121,19 +123,19 @@ class _NavigationExampleState extends State<NavigationExample> {
               label: 'Home',
             ),
             const BottomNavigationBarItem(
-              activeIcon: Icon(Icons.settings),
-              icon: Icon(Icons.settings_outlined),
-              label: 'Settings',
-            ),
-            const BottomNavigationBarItem(
               activeIcon: Icon(Icons.event),
               icon: Icon(Icons.event_outlined),
-              label: 'Events',
+              label: 'My Events',
             ),
             const BottomNavigationBarItem(
               activeIcon: Icon(Icons.calendar_month),
               icon: Icon(Icons.calendar_month_outlined),
               label: 'Calendar',
+            ),
+            const BottomNavigationBarItem(
+              activeIcon: Icon(Icons.settings),
+              icon: Icon(Icons.settings_outlined),
+              label: 'Settings',
             ),
             if (isAdmin)
               const BottomNavigationBarItem(
