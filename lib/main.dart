@@ -4,6 +4,7 @@ import 'package:ais_hackathon_better/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,14 +19,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Firebase setup',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Firebase setup',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        //home: const TestDBHelped(title: "Testing Database Helper"),
+        home: const MainPage(),
       ),
-      //home: const TestDBHelped(title: "Testing Database Helper"),
-      home: const MainPage(),
     );
   }
 }

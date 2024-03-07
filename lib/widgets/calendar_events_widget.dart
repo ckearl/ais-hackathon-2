@@ -1,7 +1,13 @@
 import 'package:ais_hackathon_better/firebase/firebase_instance_objects.dart';
+import 'package:ais_hackathon_better/widgets/riverpod_stuff.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+final eventsMapProvider =
+    StateNotifierProvider<EventsMapNotifier, Map<DateTime, Event>>(
+        (ref) => EventsMapNotifier());
 
 class CalendarEventsPage extends StatefulWidget {
   final DatabaseReference dbRef;
@@ -39,94 +45,99 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _getEventsFromDatabase(widget.dbRef),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // While the future is loading, show a loading indicator
-            return const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator(),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          } else if (snapshot.hasError) {
-            // If there's an error in the future, display an error message
-            return Text('Error: ${snapshot.error}');
-          } else {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TableCalendar(
-                  firstDay: DateTime.utc(2010, 10, 16),
-                  lastDay: DateTime.utc(2050, 3, 14),
-                  focusedDay: _focusedDay,
-                  calendarFormat: _calendarFormat,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay =
-                          focusedDay; // update `_focusedDay` here as well
-                      _selectedEvents.value = _getEventsForDay(selectedDay);
-                    });
-                  },
-                  onFormatChanged: (format) {
-                    setState(() {
-                      _calendarFormat = format;
-                    });
-                  },
-                  onPageChanged: (focusedDay) {
-                    // No need to call `setState()` here
-                    _focusedDay = focusedDay;
-                  },
-                  eventLoader: (day) {
-                    return _getEventsForDay(day);
-                  },
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: ValueListenableBuilder<List<Event>>(
-                    valueListenable: _selectedEvents,
-                    builder: (context, value, _) {
-                      return ListView.builder(
-                        itemCount: value.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 4.0,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: ListTile(
-                              onTap: () => debugPrint("${value[index]}"),
-                              title: Text("${value[index]}"),
-                            ),
-                          );
-                        },
+    // return FutureBuilder(
+    //     future: _getEventsFromDatabase(widget.dbRef, ref),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.waiting) {
+    //         // While the future is loading, show a loading indicator
+    //         return const Column(
+    //           mainAxisAlignment: MainAxisAlignment.center,
+    //           children: [
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 SizedBox(
+    //                   width: 50,
+    //                   height: 50,
+    //                   child: CircularProgressIndicator(),
+    //                 ),
+    //               ],
+    //             ),
+    //           ],
+    //         );
+    //       } else if (snapshot.hasError) {
+    //         // If there's an error in the future, display an error message
+    //         return Text('Error: ${snapshot.error}');
+    //       } else {
+    return Consumer(
+      builder: (context, ref, _) {
+        final eventsMap = ref.watch(eventsMapProvider);
+        _getEventsFromDatabase(widget.dbRef, ref);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TableCalendar(
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2050, 3, 14),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDay, day);
+              },
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay; // update `_focusedDay` here as well
+                  _selectedEvents.value = _getEventsForDay(selectedDay);
+                });
+              },
+              onFormatChanged: (format) {
+                setState(() {
+                  _calendarFormat = format;
+                });
+              },
+              onPageChanged: (focusedDay) {
+                // No need to call `setState()` here
+                _focusedDay = focusedDay;
+              },
+              eventLoader: (day) {
+                return _getEventsForDay(day);
+              },
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ValueListenableBuilder<List<Event>>(
+                valueListenable: _selectedEvents,
+                builder: (context, value, _) {
+                  return ListView.builder(
+                    itemCount: value.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: ListTile(
+                          onTap: () => debugPrint("${value[index]}"),
+                          title: Text("${value[index]}"),
+                        ),
                       );
                     },
-                  ),
-                ),
-              ],
-            );
-          }
-        });
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+  // });
 
   List<Event> _getEventsForDay(DateTime day) {
     List<Event> events = [];
@@ -138,7 +149,8 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
     return events;
   }
 
-  Future<void> _getEventsFromDatabase(DatabaseReference dbRef) async {
+  Future<void> _getEventsFromDatabase(
+      DatabaseReference dbRef, WidgetRef? ref) async {
     DataSnapshot eventsSnapshot = (await dbRef.child('events').once()).snapshot;
 
     for (var event in eventsSnapshot.children) {
@@ -157,6 +169,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
       ));
     }
 
+    ref?.read(eventsMapProvider.notifier).setEvents(eventsMap);
     return;
   }
 }
