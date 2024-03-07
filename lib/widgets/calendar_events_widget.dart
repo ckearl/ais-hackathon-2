@@ -9,7 +9,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'other_useful_widgets.dart';
 
 final eventsMapProvider =
-    StateNotifierProvider<EventsMapNotifier, Map<DateTime, Event>>(
+    StateNotifierProvider<EventsMapNotifier, Map<DateTime, List<Event>>>(
         (ref) => EventsMapNotifier());
 
 class CalendarEventsPage extends StatefulWidget {
@@ -31,7 +31,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, Event> eventsMap = {};
+  Map<DateTime, List<Event>> eventsMap = {};
   late final ValueNotifier<List<Event>> _selectedEvents;
 
   @override
@@ -75,6 +75,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                   },
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
+                      debugPrint("Day selected");
                       _selectedDay = selectedDay;
                       _focusedDay =
                           focusedDay; // update `_focusedDay` here as well
@@ -91,6 +92,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                     _focusedDay = focusedDay;
                   },
                   eventLoader: (day) {
+                    debugPrint("Loading day");
                     return _getEventsForDay(day);
                   },
                 ),
@@ -150,28 +152,46 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
   // });
 
   List<Event> _getEventsForDay(DateTime day) {
+    debugPrint("Getting day's events");
     List<Event> events = [];
+    debugPrint("$events");
     for (var event in eventsMap.keys) {
-      if (isSameDay(event, day) ||
-          (eventsMap[event]!.eventEndTime.isAfter(day) &&
-              eventsMap[event]!.eventStartTime.isBefore(day))) {
-        events.add(eventsMap[event]!);
+      // if (isSameDay(event, day)) {
+      //   events.addAll(eventsMap[event]!);
+      // }
+      debugPrint("Events ${eventsMap.keys.length}");
+      if (eventsMap[event] != null) {
+        debugPrint("EventItems: ${eventsMap[event]?.length}");
+        for (var item in eventsMap[event]!) {
+          if (isSameDay(item.eventStartTime, day) ||
+              (item.eventEndTime.isAfter(day) &&
+                  item.eventStartTime.isBefore(day))) {
+            events.add(item);
+          }
+        }
       }
     }
     return events;
   }
 }
 
-Future<Map<DateTime, Event>> getEventsFromDatabase(
+Future<Map<DateTime, List<Event>>> getEventsFromDatabase(
   DatabaseReference dbRef,
   WidgetRef? ref,
-  Map<DateTime, Event> eventsMap,
+  Map<DateTime, List<Event>> eventsMap,
 ) async {
   DataSnapshot eventsSnapshot = (await dbRef.child('events').once()).snapshot;
 
   for (var event in eventsSnapshot.children) {
-    eventsMap[DateTime.parse(event.child('eventStartTime').value.toString())] =
-        (Event(
+    if (eventsMap[
+            DateTime.parse(event.child('eventStartTime').value.toString())] ==
+        null) {
+      eventsMap[
+              DateTime.parse(event.child('eventStartTime').value.toString())] =
+          <Event>[];
+    }
+
+    Event eventToAdd = Event(
       eventId: event.key!,
       eventDescription: event.child('eventDescription').value.toString(),
       eventTitle: event.child('eventTitle').value.toString(),
@@ -181,7 +201,22 @@ Future<Map<DateTime, Event>> getEventsFromDatabase(
           DateTime.parse(event.child('eventEndTime').value.toString()),
       eventLocation: event.child('eventLocation').value.toString(),
       eventInfo: event.child('eventInfo').value.toString(),
-    ));
+    );
+
+    List<Event> compList = eventsMap[
+            DateTime.parse(event.child('eventStartTime').value.toString())] ??
+        [];
+    bool foundMatch = false;
+    if (compList.isNotEmpty) {
+      for (var checkEvent in compList) {
+        if (eventToAdd.toString() == checkEvent.toString()) foundMatch = true;
+      }
+    }
+
+    if (!foundMatch) {
+      eventsMap[DateTime.parse(event.child('eventStartTime').value.toString())]!
+          .add(eventToAdd);
+    }
   }
 
   ref?.read(eventsMapProvider.notifier).setEvents(eventsMap);
