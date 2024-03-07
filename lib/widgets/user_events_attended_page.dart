@@ -24,6 +24,8 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   List<EventItem> userEventItemsAttended = [];
   List<EventItem> futureUserEventItemsToAttend = [];
   List<EventItem> allEventItemsAttendedOrToAttend = [];
+  List<EventItem> passedEventsNotAttended = [];
+  List<EventItem> allEvents = [];
   String selectedList = "list1";
 
   Future<void> _fetchUserEvents() async {
@@ -47,19 +49,36 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
     userEventItemsAttended.clear();
     futureUserEventItemsToAttend.clear();
     allEventItemsAttendedOrToAttend.clear();
+    passedEventsNotAttended.clear();
+    allEvents.clear();
 
     for (var userEvent in userEvents) {
-      debugPrint("$userEvent");
-      debugPrint("EventItem List: ${eventItemsMap[userEvent.eventId]}");
-      if (eventItemsMap[userEvent.eventId] == null) continue;
-      if (userEvent.isAttended) {
-        userEventItemsAttended.addAll(eventItemsMap[userEvent.eventId]!);
+      if (eventItemsMap[userEvent.eventId] == null) {
+        continue;
+      } else {
+        allEvents.addAll(eventItemsMap[userEvent.eventId]!);
+        if (userEvent.isAttended) {
+          userEventItemsAttended.addAll(eventItemsMap[userEvent.eventId]!);
+        }
+        if (DateTime.parse(events[userEvent.eventId]!.eventStartTime.toString())
+            .isAfter(DateTime.now())) {
+          debugPrint(DateTime.now().toString());
+          debugPrint(DateTime.parse(
+                  events[userEvent.eventId]!.eventStartTime.toString())
+              .toString());
+          futureUserEventItemsToAttend
+              .addAll(eventItemsMap[userEvent.eventId]!);
+        }
+        if (userEvent.isAttended ||
+            DateTime.parse(events[userEvent.eventId]!.eventStartTime.toString())
+                .isAfter(DateTime.now())) {
+          allEventItemsAttendedOrToAttend
+              .addAll(eventItemsMap[userEvent.eventId]!);
+        }
+        if (!userEvent.isAttended) {
+          passedEventsNotAttended.addAll(eventItemsMap[userEvent.eventId]!);
+        }
       }
-      if (DateTime.parse(events[userEvent.eventId]!.eventStartTime.toString())
-          .isAfter(DateTime.now())) {
-        futureUserEventItemsToAttend.addAll(eventItemsMap[userEvent.eventId]!);
-      }
-      allEventItemsAttendedOrToAttend.addAll(eventItemsMap[userEvent.eventId]!);
     }
   }
 
@@ -93,16 +112,8 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
           // using the data fetched by _fetchUserEvents()
           return Scaffold(
               appBar: AppBar(
-                title: const Center(
-                  child: Text(
-                    "User Events",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              body: Column(
-                children: [
-                  DropdownButton<String>(
+                title: Center(
+                  child: DropdownButton<String>(
                     value: selectedList,
                     onChanged: (newValue) {
                       setState(() {
@@ -122,8 +133,20 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                         value: 'list3',
                         child: Text('Attended + Upcoming Events'),
                       ),
+                      DropdownMenuItem(
+                        value: 'list4',
+                        child: Text('Missed Events'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'list5',
+                        child: Text('All Events'),
+                      ),
                     ],
                   ),
+                ),
+              ),
+              body: Column(
+                children: [
                   const SizedBox(height: 20),
                   if (selectedList == 'list1')
                     buildList(userEventItemsAttended)
@@ -131,6 +154,10 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                     buildList(futureUserEventItemsToAttend)
                   else if (selectedList == 'list3')
                     buildList(allEventItemsAttendedOrToAttend)
+                  else if (selectedList == 'list4')
+                    buildList(passedEventsNotAttended)
+                  else if (selectedList == 'list5')
+                    buildList(allEvents)
                   else
                     const SizedBox(height: 0)
                 ],
