@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/user_events_attended_page.dart';
+import '../widgets/calendar_events_widget.dart';
 
 class NavigationBarApp extends StatelessWidget {
   final String uid;
@@ -76,7 +76,11 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
       ),
       const UserInfoPage(),
-      UserEventsAttendedPage(
+      // UserEventsAttendedPage(
+      //   dbRef: dbRef,
+      //   userId: FirebaseAuth.instance.currentUser!.uid,
+      // ),
+      CalendarEventsPage(
         dbRef: dbRef,
         userId: FirebaseAuth.instance.currentUser!.uid,
       ),
@@ -93,6 +97,9 @@ class _NavigationExampleState extends State<NavigationExample> {
     ];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("AIS Punchcard"),
+      ),
       body: pages[_currentIndex],
       // For some reason, this padding needs to surround the bottom nav bar
       // to work properly on small iOS devices (i.e. iPhone SE)
@@ -112,10 +119,15 @@ class _NavigationExampleState extends State<NavigationExample> {
               icon: Icon(Icons.settings_outlined),
               label: 'Settings',
             ),
+            // const BottomNavigationBarItem(
+            //   activeIcon: Icon(Icons.event),
+            //   icon: Icon(Icons.event_outlined),
+            //   label: 'Events',
+            // ),
             const BottomNavigationBarItem(
-              activeIcon: Icon(Icons.event),
-              icon: Icon(Icons.event_outlined),
-              label: 'Events',
+              activeIcon: Icon(Icons.calendar_month),
+              icon: Icon(Icons.calendar_month_outlined),
+              label: 'Calendar',
             ),
             if (isAdmin)
               const BottomNavigationBarItem(

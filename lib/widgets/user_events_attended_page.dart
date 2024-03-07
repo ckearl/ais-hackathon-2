@@ -29,6 +29,7 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
 
   Future<void> _fetchEventItems() async {
     eventItemsMap = await getMapOfEventItemsFromEventsMap(widget.dbRef, events);
+    // calendarItemsMap;
   }
 
   @override
