@@ -12,3 +12,13 @@ class EventsMapNotifier extends StateNotifier<Map<DateTime, Event>> {
     state = events;
   }
 }
+
+class EventItemsMapNotifier extends StateNotifier<Map<DateTime, EventItem>> {
+  EventItemsMapNotifier() : super({}) {
+    setEventItems({});
+  }
+
+  void setEventItems(Map<DateTime, EventItem> eventItems) {
+    state = eventItems;
+  }
+}

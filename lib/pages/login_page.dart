@@ -160,12 +160,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                     ),
                     child: FractionallySizedBox(
                       widthFactor: widthFactor,
-                      // TODO move this implementation to a new screen with password verification through multiline string check
                       child: SocialLoginButton(
-                        // onPressed: () => _signUpWithEmail(
-                        //   emailController.text,
-                        //   passwordController.text,
-                        // ),
                         onPressed: () {
                           Navigator.push(
                             context,

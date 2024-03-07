@@ -2,6 +2,7 @@ import 'package:ais_hackathon_better/widgets/user_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../widgets/calendar_events_widget.dart';
 import '../widgets/user_events_attended_page.dart';
@@ -81,10 +82,13 @@ class _NavigationExampleState extends State<NavigationExample> {
         dbRef: dbRef,
         userId: FirebaseAuth.instance.currentUser!.uid,
       ),
-      CalendarEventsPage(
-        dbRef: dbRef,
-        userId: FirebaseAuth.instance.currentUser!.uid,
-      ),
+      Consumer(builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        return CalendarEventsPage(
+          dbRef: dbRef,
+          userId: FirebaseAuth.instance.currentUser!.uid,
+          ref: ref,
+        );
+      }),
       if (isAdmin)
         const Column(
           mainAxisAlignment: MainAxisAlignment.center,
