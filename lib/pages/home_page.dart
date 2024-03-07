@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/calendar_events_widget.dart';
+import '../widgets/user_events_attended_page.dart';
 
 class NavigationBarApp extends StatelessWidget {
   final String uid;
@@ -76,10 +77,10 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
       ),
       const UserInfoPage(),
-      // UserEventsAttendedPage(
-      //   dbRef: dbRef,
-      //   userId: FirebaseAuth.instance.currentUser!.uid,
-      // ),
+      UserEventsAttendedPage(
+        dbRef: dbRef,
+        userId: FirebaseAuth.instance.currentUser!.uid,
+      ),
       CalendarEventsPage(
         dbRef: dbRef,
         userId: FirebaseAuth.instance.currentUser!.uid,
@@ -104,10 +105,11 @@ class _NavigationExampleState extends State<NavigationExample> {
       // For some reason, this padding needs to surround the bottom nav bar
       // to work properly on small iOS devices (i.e. iPhone SE)
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(.000001, 0, .000001, 0),
+        padding: const EdgeInsets.fromLTRB(.0001, 0, .0001, 0),
         child: BottomNavigationBar(
           onTap: _onTabTapped,
           currentIndex: _currentIndex,
+          type: BottomNavigationBarType.fixed,
           items: [
             const BottomNavigationBarItem(
               activeIcon: Icon(Icons.home),
@@ -119,11 +121,11 @@ class _NavigationExampleState extends State<NavigationExample> {
               icon: Icon(Icons.settings_outlined),
               label: 'Settings',
             ),
-            // const BottomNavigationBarItem(
-            //   activeIcon: Icon(Icons.event),
-            //   icon: Icon(Icons.event_outlined),
-            //   label: 'Events',
-            // ),
+            const BottomNavigationBarItem(
+              activeIcon: Icon(Icons.event),
+              icon: Icon(Icons.event_outlined),
+              label: 'Events',
+            ),
             const BottomNavigationBarItem(
               activeIcon: Icon(Icons.calendar_month),
               icon: Icon(Icons.calendar_month_outlined),
