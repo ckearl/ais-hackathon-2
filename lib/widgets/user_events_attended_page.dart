@@ -1,4 +1,5 @@
 import 'package:ais_hackathon_better/firebase/firebase_instance_objects.dart';
+import 'package:ais_hackathon_better/widgets/other_useful_widgets.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -18,8 +19,12 @@ class UserEventsAttendedPage extends StatefulWidget {
 class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
   List<UserEvent> userEvents = [];
   Map<String, Event> events = {};
-  Set<EventItem> eventItems = {};
   Map<String, List<EventItem>> eventItemsMap = {};
+
+  List<EventItem> userEventItemsAttended = [];
+  List<EventItem> futureUserEventItemsToAttend = [];
+  List<EventItem> allEventItemsAttendedOrToAttend = [];
+  String selectedList = "list1";
 
   Future<void> _fetchUserEvents() async {
     userEvents = await getListOfUserEvents(widget.dbRef, widget.userId);
@@ -29,7 +34,33 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
 
   Future<void> _fetchEventItems() async {
     eventItemsMap = await getMapOfEventItemsFromEventsMap(widget.dbRef, events);
+    await sortEventItems();
+    debugPrint("userEventItemsAttended: ${userEventItemsAttended.length}");
+    debugPrint(
+        "futureUserEventItemsToAttend: ${futureUserEventItemsToAttend.length}");
+    debugPrint(
+        "allEventItemsAttendedOrToAttend: ${allEventItemsAttendedOrToAttend.length}");
     // calendarItemsMap;
+  }
+
+  Future<void> sortEventItems() async {
+    userEventItemsAttended.clear();
+    futureUserEventItemsToAttend.clear();
+    allEventItemsAttendedOrToAttend.clear();
+
+    for (var userEvent in userEvents) {
+      debugPrint("$userEvent");
+      debugPrint("EventItem List: ${eventItemsMap[userEvent.eventId]}");
+      if (eventItemsMap[userEvent.eventId] == null) continue;
+      if (userEvent.isAttended) {
+        userEventItemsAttended.addAll(eventItemsMap[userEvent.eventId]!);
+      }
+      if (DateTime.parse(events[userEvent.eventId]!.eventStartTime.toString())
+          .isAfter(DateTime.now())) {
+        futureUserEventItemsToAttend.addAll(eventItemsMap[userEvent.eventId]!);
+      }
+      allEventItemsAttendedOrToAttend.addAll(eventItemsMap[userEvent.eventId]!);
+    }
   }
 
   @override
@@ -61,54 +92,113 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
           // If the future has completed successfully, you can build your UI
           // using the data fetched by _fetchUserEvents()
           return Scaffold(
-            appBar: AppBar(
-              title: const Center(
-                child: Text(
-                  "User Events",
-                  textAlign: TextAlign.center,
+              appBar: AppBar(
+                title: const Center(
+                  child: Text(
+                    "User Events",
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-            body: Center(
-              child: SizedBox(
-                child: ListView.builder(
-                  itemCount: userEvents.length,
-                  itemBuilder: (context, index) {
-                    UserEvent userEvent = userEvents[index];
-                    // If event has been attended or hasn't occurred yet, show it in the list.
-                    if (userEvent.isAttended ||
-                        DateTime.parse(events[userEvent.eventId]!
-                                .eventStartTime
-                                .toString())
-                            .isAfter(DateTime.now())) {
-                      return ListTile(
-                        // TODO change this to Event Title: Type
-                        title: Text(
-                          "Type ${eventItemsMap[userEvent.eventId]?.first.eventItemTitle}: "
-                          "${EventItemType(
-                            eventItemTypeId: eventItemsMap[userEvent.eventId]!
-                                .first!
-                                .eventItemType,
-                            typeName: "Discover",
-                          ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
-                          textAlign: TextAlign.center,
-                        ),
-                        subtitle: Text(
-                          eventItemsMap[userEvent.eventId]!
-                              .first!
-                              .eventItemInfo,
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-          );
+              body: Column(
+                children: [
+                  DropdownButton<String>(
+                    value: selectedList,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedList = newValue!;
+                      });
+                    },
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'list1',
+                        child: Text('Events Attended'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'list2',
+                        child: Text('Upcoming Events'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'list3',
+                        child: Text('Attended + Upcoming Events'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  if (selectedList == 'list1')
+                    buildList(userEventItemsAttended)
+                  else if (selectedList == 'list2')
+                    buildList(futureUserEventItemsToAttend)
+                  else if (selectedList == 'list3')
+                    buildList(allEventItemsAttendedOrToAttend)
+                  else
+                    const SizedBox(height: 0)
+                ],
+              )
+              //   Center(
+              //   child: SizedBox(
+              //     child: ListView.builder(
+              //       itemCount: userEvents.length,
+              //       itemBuilder: (context, index) {
+              //         UserEvent userEvent = userEvents[index];
+              //
+              //         // If event has been attended or hasn't occurred yet, show it in the list.
+              //         if (userEvent.isAttended ||
+              //             DateTime.parse(events[userEvent.eventId]!
+              //                     .eventStartTime
+              //                     .toString())
+              //                 .isAfter(DateTime.now())) {
+              //           return ListTile(
+              //             // TODO change this to Event Title: Type
+              //             title: Text(
+              //               "Type ${eventItemsMap[userEvent.eventId]?.first.eventItemTitle}: "
+              //               "${EventItemType(
+              //                 eventItemTypeId: eventItemsMap[userEvent.eventId]!
+              //                     .first
+              //                     .eventItemType,
+              //                 typeName: "Discover",
+              //               ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
+              //               textAlign: TextAlign.center,
+              //             ),
+              //             subtitle: Text(
+              //               eventItemsMap[userEvent.eventId]!.first.eventItemInfo,
+              //               textAlign: TextAlign.center,
+              //             ),
+              //           );
+              //         } else {
+              //           return const SizedBox(
+              //             height: 0,
+              //           );
+              //         }
+              //       },
+              //     ),
+              //   ),
+              // ),
+              );
         }
       },
     );
+  }
+
+  Widget buildList(List<EventItem> list) {
+    return Expanded(
+        child: ListView.builder(
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 4.0,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: ListTile(
+                  title: DatabaseEventItemText(eventItem: list[index]),
+                ),
+              );
+            }));
   }
 }
 
