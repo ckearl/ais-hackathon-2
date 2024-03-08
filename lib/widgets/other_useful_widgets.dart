@@ -44,21 +44,34 @@ class DatabaseEventItemText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat("MM-dd-yy HH:mm");
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text(
-          eventItem.eventItemTitle,
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          "\n${eventItem.eventItemInfo}"
-          "\nLocation: ${eventItem.eventItemLocation}"
-          "\nStart Time: ${dateFormat.format(eventItem.eventItemStartTime)}"
-          "\nEnd Time: ${dateFormat.format(eventItem.eventItemEndTime)}",
-          textAlign: TextAlign.start,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(
+            eventItem.eventItemTitle,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            "\n${eventItem.eventItemInfo}"
+            "\nLocation: ${eventItem.eventItemLocation}"
+            "\nStart Time: ${dateFormat.format(eventItem.eventItemStartTime)}"
+            "\nEnd Time: ${dateFormat.format(eventItem.eventItemEndTime)}",
+            textAlign: TextAlign.start,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text(
+                "More Info",
+                style: TextStyle(color: Color.fromRGBO(0, 46, 93, 1)),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

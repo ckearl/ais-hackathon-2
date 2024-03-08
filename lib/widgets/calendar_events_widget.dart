@@ -117,23 +117,40 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             child: ListTile(
-                              onTap: () {
-                                debugPrint("${value[index]}");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DatabaseEventInteractiveWidget(
-                                      databaseEvent: value[index],
-                                      dbRef: widget.dbRef,
-                                      ref: ref,
-                                      day: _focusedDay,
+                              onTap: () {},
+                              title: Column(
+                                children: [
+                                  DatabaseEventText(
+                                    databaseEvent: value[index],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DatabaseEventInteractiveWidget(
+                                              databaseEvent: value[index],
+                                              dbRef: widget.dbRef,
+                                              ref: ref,
+                                              day: _focusedDay,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        "More Info",
+                                        style: TextStyle(
+                                            color:
+                                                Color.fromRGBO(0, 46, 93, 1)),
+                                      ),
                                     ),
                                   ),
-                                );
-                              },
-                              title: DatabaseEventText(
-                                  databaseEvent: value[index]),
+                                ],
+                              ),
                             ),
                           ),
                         );
