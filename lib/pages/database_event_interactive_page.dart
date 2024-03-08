@@ -9,6 +9,7 @@ import '../widgets/other_useful_widgets.dart';
 class DatabaseEventInteractiveWidget extends StatefulWidget {
   final Event databaseEvent;
   final DatabaseReference dbRef;
+  final String userId;
   final WidgetRef ref;
   final DateTime day;
   const DatabaseEventInteractiveWidget({
@@ -17,6 +18,7 @@ class DatabaseEventInteractiveWidget extends StatefulWidget {
     required this.dbRef,
     required this.ref,
     required this.day,
+    required this.userId,
   });
 
   @override
@@ -113,6 +115,8 @@ class _DatabaseEventInteractiveWidgetState
                                 child: ListTile(
                                   title: DatabaseEventItemText(
                                     eventItem: value[index],
+                                    dbRef: widget.dbRef,
+                                    userId: widget.userId,
                                   ),
                                 ),
                               ),

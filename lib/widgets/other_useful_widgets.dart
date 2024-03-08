@@ -38,7 +38,14 @@ class DatabaseEventText extends StatelessWidget {
 
 class DatabaseEventItemText extends StatefulWidget {
   final EventItem eventItem;
-  const DatabaseEventItemText({super.key, required this.eventItem});
+  final DatabaseReference dbRef;
+  final String userId;
+  const DatabaseEventItemText({
+    super.key,
+    required this.eventItem,
+    required this.dbRef,
+    required this.userId,
+  });
 
   @override
   State<DatabaseEventItemText> createState() => _DatabaseEventItemTextState();
@@ -47,6 +54,8 @@ class DatabaseEventItemText extends StatefulWidget {
 class _DatabaseEventItemTextState extends State<DatabaseEventItemText> {
   late bool moreInfo;
   late bool isAttended;
+  late bool userActuallyAttended;
+  late bool needToCreateUserEventEntry;
   String errorMessage = "";
   final passwordController = TextEditingController();
 
@@ -55,6 +64,8 @@ class _DatabaseEventItemTextState extends State<DatabaseEventItemText> {
     super.initState();
     moreInfo = false;
     isAttended = false;
+    userActuallyAttended = false;
+    needToCreateUserEventEntry = true;
   }
 
   @override
@@ -63,81 +74,128 @@ class _DatabaseEventItemTextState extends State<DatabaseEventItemText> {
     super.dispose();
   }
 
+  Future<bool> userEventExistsAndWasAttended() async {
+    DataSnapshot userEventsSnapshot =
+        (await widget.dbRef.child('userEvents').once()).snapshot;
+    List userEventsForCurrentUser =
+        userEventsSnapshot.children.where((element) {
+      if (element.child('eventID').value == widget.eventItem.eventId &&
+          element.child('userID').value == widget.userId) {
+        return true;
+      } else {
+        return false;
+      }
+    }).toList();
+
+    if (userEventsForCurrentUser.isEmpty) {
+      debugPrint("User event DNE..");
+    } else {
+      for (var element in userEventsForCurrentUser) {
+        needToCreateUserEventEntry = false;
+        if (element.child('isAttended').value.toString() == "true") {
+          debugPrint("Returning true, user already attended");
+          userActuallyAttended = true;
+          return true;
+        } else {
+          debugPrint(
+              "Returning false, user hasn't already attended but event exists");
+          return false;
+        }
+      }
+    }
+
+    needToCreateUserEventEntry = true;
+    debugPrint("Returning false, user did not attend and event DNE");
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat("MM-dd-yy HH:mm");
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(
-            widget.eventItem.eventItemTitle,
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            "\n${widget.eventItem.eventItemInfo}"
-            "\nLocation: ${widget.eventItem.eventItemLocation}"
-            "\nStart Time: ${dateFormat.format(widget.eventItem.eventItemStartTime)}"
-            "\nEnd Time: ${dateFormat.format(widget.eventItem.eventItemEndTime)}",
-            textAlign: TextAlign.start,
-          ),
-          if (moreInfo) moreInfoWidget(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  moreInfo = !moreInfo;
-                });
-              },
-              child: Text(
-                (moreInfo) ? "Less Info" : "More Info / Mark Attendance",
-                style: const TextStyle(color: Color.fromRGBO(0, 46, 93, 1)),
-                textAlign: TextAlign.center,
-              ),
+    return FutureBuilder(
+        future: userEventExistsAndWasAttended(),
+        builder: (context, snapshot) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  widget.eventItem.eventItemTitle,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "\n${widget.eventItem.eventItemInfo}"
+                  "\nLocation: ${widget.eventItem.eventItemLocation}"
+                  "\nStart Time: ${dateFormat.format(widget.eventItem.eventItemStartTime)}"
+                  "\nEnd Time: ${dateFormat.format(widget.eventItem.eventItemEndTime)}",
+                  textAlign: TextAlign.start,
+                ),
+                if (moreInfo) moreInfoWidget(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        moreInfo = !moreInfo;
+                      });
+                    },
+                    child: Text(
+                      (moreInfo) ? "Less Info" : "More Info / Mark Attendance",
+                      style:
+                          const TextStyle(color: Color.fromRGBO(0, 46, 93, 1)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Widget moreInfoWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Padding(padding: EdgeInsets.all(4.0)),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              isAttended = !isAttended;
-            });
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Checkbox(
-                activeColor: const Color.fromRGBO(0, 46, 93, 1),
-                value: isAttended,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isAttended = value!;
-                  });
-                },
-              ),
-              const Text('Did you attend this event?')
-            ],
+    if (!userActuallyAttended) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Padding(padding: EdgeInsets.all(4.0)),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isAttended = !isAttended;
+              });
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Checkbox(
+                  activeColor: const Color.fromRGBO(0, 46, 93, 1),
+                  value: isAttended,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isAttended = value!;
+                    });
+                  },
+                ),
+                const Text('Did you attend this event?')
+              ],
+            ),
           ),
-        ),
-        if (moreInfo &&
-            isAttended &&
-            DateTime.now().isBefore(widget.eventItem.eventItemEndTime) &&
-            DateTime.now().isAfter(widget.eventItem.eventItemStartTime))
-          const Text("Verify location if during event"),
-        if (moreInfo && isAttended) verifyPasswordWidget(),
-      ],
-    );
+          if (moreInfo &&
+              isAttended &&
+              DateTime.now().isBefore(widget.eventItem.eventItemEndTime) &&
+              DateTime.now().isAfter(widget.eventItem.eventItemStartTime))
+            const Text("Verify location if during event"),
+          if (moreInfo && isAttended) verifyPasswordWidget(),
+        ],
+      );
+    } else {
+      return const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text("You've attended this event!"),
+      );
+    }
   }
 
   Widget verifyPasswordWidget() {
@@ -187,6 +245,17 @@ class _DatabaseEventItemTextState extends State<DatabaseEventItemText> {
                     errorMessage = "Invalid Password! Try Again..";
                   });
                 } else {
+                  if (userActuallyAttended == false) {
+                    if (needToCreateUserEventEntry == true) {
+                      // TODO
+                      debugPrint("Need to create user entry");
+                    } else {
+                      // TODO
+                      debugPrint(
+                          "Need to update database entry that already exists");
+                    }
+                  }
+                  // widget.dbRef.child('userEvent')
                   setState(() {
                     errorMessage = "";
                   });

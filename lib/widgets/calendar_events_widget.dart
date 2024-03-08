@@ -135,6 +135,7 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                                                 DatabaseEventInteractiveWidget(
                                               databaseEvent: value[index],
                                               dbRef: widget.dbRef,
+                                              userId: widget.userId,
                                               ref: ref,
                                               day: _focusedDay,
                                             ),

@@ -183,7 +183,11 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: ListTile(
-                  title: DatabaseEventItemText(eventItem: list[index]),
+                  title: DatabaseEventItemText(
+                    eventItem: list[index],
+                    dbRef: widget.dbRef,
+                    userId: widget.userId,
+                  ),
                 ),
               );
             }));
