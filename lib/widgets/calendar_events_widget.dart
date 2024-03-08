@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../pages/database_event_interactive_page.dart';
 import 'other_useful_widgets.dart';
 
 final eventsMapProvider =
@@ -117,7 +118,6 @@ class _CalendarEventsPageState extends State<CalendarEventsPage> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             child: ListTile(
-                              onTap: () {},
                               title: Column(
                                 children: [
                                   DatabaseEventText(

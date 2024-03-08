@@ -111,97 +111,58 @@ class _UserEventsAttendedPageState extends State<UserEventsAttendedPage> {
           // If the future has completed successfully, you can build your UI
           // using the data fetched by _fetchUserEvents()
           return Scaffold(
-              appBar: AppBar(
-                title: Center(
-                  child: DropdownButton<String>(
-                    value: selectedList,
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedList = newValue!;
-                      });
-                    },
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'list1',
-                        child: Text('Events Attended'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'list2',
-                        child: Text('Upcoming Events'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'list3',
-                        child: Text('Attended + Upcoming Events'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'list4',
-                        child: Text('Missed Events'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'list5',
-                        child: Text('All Events'),
-                      ),
-                    ],
-                  ),
+            appBar: AppBar(
+              title: Center(
+                child: DropdownButton<String>(
+                  value: selectedList,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedList = newValue!;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'list1',
+                      child: Text('Events Attended'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'list2',
+                      child: Text('Upcoming Events'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'list3',
+                      child: Text('Attended + Upcoming Events'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'list4',
+                      child: Text('Missed Events'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'list5',
+                      child: Text('All Events'),
+                    ),
+                  ],
                 ),
               ),
-              body: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  if (selectedList == 'list1')
-                    buildList(userEventItemsAttended)
-                  else if (selectedList == 'list2')
-                    buildList(futureUserEventItemsToAttend)
-                  else if (selectedList == 'list3')
-                    buildList(allEventItemsAttendedOrToAttend)
-                  else if (selectedList == 'list4')
-                    buildList(passedEventsNotAttended)
-                  else if (selectedList == 'list5')
-                    buildList(allEvents)
-                  else
-                    const SizedBox(height: 0)
-                ],
-              )
-              //   Center(
-              //   child: SizedBox(
-              //     child: ListView.builder(
-              //       itemCount: userEvents.length,
-              //       itemBuilder: (context, index) {
-              //         UserEvent userEvent = userEvents[index];
-              //
-              //         // If event has been attended or hasn't occurred yet, show it in the list.
-              //         if (userEvent.isAttended ||
-              //             DateTime.parse(events[userEvent.eventId]!
-              //                     .eventStartTime
-              //                     .toString())
-              //                 .isAfter(DateTime.now())) {
-              //           return ListTile(
-              //             // TODO change this to Event Title: Type
-              //             title: Text(
-              //               "Type ${eventItemsMap[userEvent.eventId]?.first.eventItemTitle}: "
-              //               "${EventItemType(
-              //                 eventItemTypeId: eventItemsMap[userEvent.eventId]!
-              //                     .first
-              //                     .eventItemType,
-              //                 typeName: "Discover",
-              //               ).typeName}", //(widget.dbRef.child('eventTypes').once()).snapshot.child('typeName/${eventItems.firstWhere((element) => element.eventId == userEvent.eventId).eventItemType}').value.toString()).typeName}",
-              //               textAlign: TextAlign.center,
-              //             ),
-              //             subtitle: Text(
-              //               eventItemsMap[userEvent.eventId]!.first.eventItemInfo,
-              //               textAlign: TextAlign.center,
-              //             ),
-              //           );
-              //         } else {
-              //           return const SizedBox(
-              //             height: 0,
-              //           );
-              //         }
-              //       },
-              //     ),
-              //   ),
-              // ),
-              );
+            ),
+            body: Column(
+              children: [
+                const SizedBox(height: 20),
+                if (selectedList == 'list1')
+                  buildList(userEventItemsAttended)
+                else if (selectedList == 'list2')
+                  buildList(futureUserEventItemsToAttend)
+                else if (selectedList == 'list3')
+                  buildList(allEventItemsAttendedOrToAttend)
+                else if (selectedList == 'list4')
+                  buildList(passedEventsNotAttended)
+                else if (selectedList == 'list5')
+                  buildList(allEvents)
+                else
+                  const SizedBox(height: 0)
+              ],
+            ),
+          );
         }
       },
     );
@@ -314,6 +275,7 @@ Future<Map<String, List<EventItem>>> getMapOfEventItemsFromEventsMap(
         eventItemEndTime:
             DateTime.parse(snapshot.child('eventItemEndTime').value.toString()),
         eventItemType: snapshot.child('eventItemType').value.toString(),
+        password: snapshot.child('password').value.toString(),
         waiver: snapshot.child('waiver').value.toString(),
       )));
     }

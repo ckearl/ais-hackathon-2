@@ -147,6 +147,7 @@ class EventItem {
   DateTime eventItemStartTime;
   DateTime eventItemEndTime;
   String eventItemType;
+  String password;
   String waiver;
 
   EventItem({
@@ -158,6 +159,7 @@ class EventItem {
     required this.eventItemStartTime,
     required this.eventItemEndTime,
     required this.eventItemType,
+    required this.password,
     required this.waiver,
   });
 
@@ -171,6 +173,7 @@ class EventItem {
       eventItemStartTime: json['itemStartTime'],
       eventItemEndTime: json['itemEndTime'],
       eventItemType: json['eventItemType'],
+      password: json['password'],
       waiver: json['waiver'],
     );
   }
@@ -185,6 +188,7 @@ class EventItem {
       "itemStartTime": eventItemStartTime,
       "itemEndTime": eventItemEndTime,
       "eventItemType": eventItemType,
+      "password": password,
       "waiver": waiver,
     };
   }
@@ -195,7 +199,7 @@ class EventItem {
         "$eventItemTitle, eventItemLocation: $eventItemLocation, eventItemInfo: "
         "$eventItemInfo, eventId: $eventId, itemStartTime: $eventItemStartTime, "
         "itemEndTime: $eventItemEndTime, eventItemType: $eventItemType, "
-        "waiver: $waiver}";
+        "password: $password, waiver: $waiver}";
   }
 }
 
