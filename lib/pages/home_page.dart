@@ -106,6 +106,7 @@ class _NavigationExampleState extends State<NavigationExample> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("AIS Punchcard"),
+        backgroundColor: const Color.fromRGBO(0, 87, 184, 1),
       ),
       body: pages[_currentIndex],
       // For some reason, this padding needs to surround the bottom nav bar
@@ -113,6 +114,9 @@ class _NavigationExampleState extends State<NavigationExample> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(.0001, 0, .0001, 0),
         child: BottomNavigationBar(
+          backgroundColor: const Color.fromRGBO(0, 46, 93, 1),
+          unselectedItemColor: Colors.grey,
+          selectedItemColor: Colors.white,
           onTap: _onTabTapped,
           currentIndex: _currentIndex,
           type: BottomNavigationBarType.fixed,
@@ -141,7 +145,7 @@ class _NavigationExampleState extends State<NavigationExample> {
               const BottomNavigationBarItem(
                 activeIcon: Icon(Icons.admin_panel_settings),
                 icon: Icon(Icons.admin_panel_settings_outlined),
-                label: 'Admin Stuff',
+                label: 'Admin',
               ),
           ],
         ),

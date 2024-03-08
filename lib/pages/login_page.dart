@@ -88,27 +88,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                         ),
                       ],
                     ),
-                  // Container(height: 20),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     const Text("Don't have an account? "),
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //                 builder: (context) => const SignUpWidget()));
-                  //       },
-                  //       child: const Text(
-                  //         "Sign Up",
-                  //         style: TextStyle(
-                  //           decoration: TextDecoration.underline,
-                  //         ),
-                  //       ),
-                  //     )
-                  //   ],
-                  // ),
                   Container(height: 20),
                   // Generic Login Button
                   Container(
