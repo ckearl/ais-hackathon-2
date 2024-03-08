@@ -4,8 +4,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../widgets/calendar_events_widget.dart';
-import '../widgets/user_events_attended_page.dart';
+import 'admin_page.dart';
+import 'calendar_events_page.dart';
+import 'user_events_attended_page.dart';
 
 class NavigationBarApp extends StatelessWidget {
   final String uid;
@@ -92,15 +93,13 @@ class _NavigationExampleState extends State<NavigationExample> {
         return UserInfoPage(ref: ref);
       }),
       if (isAdmin)
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Text("You are an admin!")],
-            )
-          ],
-        ),
+        Consumer(builder: (context, ref, _) {
+          return AdminPage(
+            ref: ref,
+            dbRef: dbRef,
+            userId: FirebaseAuth.instance.currentUser!.uid,
+          );
+        }),
     ];
 
     return Scaffold(

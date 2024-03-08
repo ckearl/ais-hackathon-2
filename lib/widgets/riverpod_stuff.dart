@@ -1,5 +1,6 @@
 // Provider for events map
 import 'package:ais_hackathon_better/firebase/firebase_instance_objects.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // State notifier for events map
@@ -53,4 +54,28 @@ class UserUsernameNotifier extends StateNotifier<String> {
   UserUsernameNotifier() : super("");
 
   void setString(String str) => state = str;
+}
+
+class StartTimeNotifier extends StateNotifier<TimeOfDay> {
+  StartTimeNotifier() : super(TimeOfDay.now());
+
+  void setTime(TimeOfDay time) => state = time;
+}
+
+class EndTimeNotifier extends StateNotifier<TimeOfDay> {
+  EndTimeNotifier() : super(TimeOfDay.now());
+
+  void setTime(TimeOfDay time) => state = time;
+}
+
+class StartDayNotifier extends StateNotifier<DateTime> {
+  StartDayNotifier() : super(DateTime.now());
+
+  void setTime(DateTime date) => state = date;
+}
+
+class EndDayNotifier extends StateNotifier<DateTime> {
+  EndDayNotifier() : super(DateTime.now());
+
+  void setTime(DateTime date) => state = date;
 }

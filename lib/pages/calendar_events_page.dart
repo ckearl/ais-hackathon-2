@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../pages/database_event_interactive_page.dart';
-import 'other_useful_widgets.dart';
+import '../widgets/other_useful_widgets.dart';
+import 'database_event_interactive_page.dart';
 
 final eventsMapProvider =
     StateNotifierProvider<EventsMapNotifier, Map<DateTime, List<Event>>>(
