@@ -92,7 +92,10 @@ class _NavigationExampleState extends State<NavigationExample> {
       Consumer(builder: (context, ref, _) {
         return UserInfoPage(ref: ref);
       }),
+      // TODO reinstate isAdmin
       // if (isAdmin)
+      // removed to allow non-admin testers the functionality that admins will have
+      // end TODO
       Consumer(builder: (context, ref, _) {
         return AdminPage(
           ref: ref,
@@ -140,7 +143,10 @@ class _NavigationExampleState extends State<NavigationExample> {
               icon: Icon(Icons.settings_outlined),
               label: 'Settings',
             ),
+            // TODO reinstate isAdmin
             // if (isAdmin)
+            // removed to allow non-admin testers the functionality that admins will have
+            // end TODO
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.admin_panel_settings),
               icon: Icon(Icons.admin_panel_settings_outlined),
