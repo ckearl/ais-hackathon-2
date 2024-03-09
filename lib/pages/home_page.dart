@@ -92,14 +92,14 @@ class _NavigationExampleState extends State<NavigationExample> {
       Consumer(builder: (context, ref, _) {
         return UserInfoPage(ref: ref);
       }),
-      if (isAdmin)
-        Consumer(builder: (context, ref, _) {
-          return AdminPage(
-            ref: ref,
-            dbRef: dbRef,
-            userId: FirebaseAuth.instance.currentUser!.uid,
-          );
-        }),
+      // if (isAdmin)
+      Consumer(builder: (context, ref, _) {
+        return AdminPage(
+          ref: ref,
+          dbRef: dbRef,
+          userId: FirebaseAuth.instance.currentUser!.uid,
+        );
+      }),
     ];
 
     return Scaffold(
@@ -119,33 +119,33 @@ class _NavigationExampleState extends State<NavigationExample> {
           onTap: _onTabTapped,
           currentIndex: _currentIndex,
           type: BottomNavigationBarType.fixed,
-          items: [
-            const BottomNavigationBarItem(
+          items: const [
+            BottomNavigationBarItem(
               activeIcon: Icon(Icons.home),
               icon: Icon(Icons.home_outlined),
               label: 'Home',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               activeIcon: Icon(Icons.event),
               icon: Icon(Icons.event_outlined),
               label: 'My Events',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               activeIcon: Icon(Icons.calendar_month),
               icon: Icon(Icons.calendar_month_outlined),
               label: 'Calendar',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               activeIcon: Icon(Icons.settings),
               icon: Icon(Icons.settings_outlined),
               label: 'Settings',
             ),
-            if (isAdmin)
-              const BottomNavigationBarItem(
-                activeIcon: Icon(Icons.admin_panel_settings),
-                icon: Icon(Icons.admin_panel_settings_outlined),
-                label: 'Admin',
-              ),
+            // if (isAdmin)
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.admin_panel_settings),
+              icon: Icon(Icons.admin_panel_settings_outlined),
+              label: 'Admin',
+            ),
           ],
         ),
       ),
