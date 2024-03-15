@@ -11,7 +11,8 @@
 - From the ```main.dart``` file located in ``/lib``, right click it and run the app in either Chrome or in an emulator of your choice
 - FYI - It isn't fully functional as I didn't have enough time or help :(
 
-# ais_hackathon
+
+# Here are the instructions to the hackathon, if needed: ais_hackathon
 
 A punchcard tracking system for BYU AIS activities (hopefully)
 
